@@ -1,0 +1,4 @@
+101; Alex; 12; LE11 3TU; Loughborough; admin
+102; Sam; 14; NG1 4BU; Nottingham; customer
+103; Ren; 100; CV1 2GT; Coventry; customer
+104; Noor; 57; B1 1AA; Birmingham; customer
