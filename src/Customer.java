@@ -44,6 +44,7 @@ public class Customer extends User{
         StringBuilder basketContents = new StringBuilder();
         for (Product product : basket) {
             basketContents.append(product);
+            basketContents.append("\n");
         }
         return basketContents.toString();
     }

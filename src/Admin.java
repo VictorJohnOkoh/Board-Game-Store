@@ -1,11 +1,8 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
-import java.nio.file.Files;
-import java.util.List;
+import java.io.PrintWriter;
 
 public class Admin extends User{
 
@@ -13,7 +10,7 @@ public class Admin extends User{
         super(id, name, address, "admin");
     }
 
-    public void addBoardGame(String productFile){
+    public void addBoardGame(File productFile){
         Scanner input = new Scanner(System.in);
         int product_id;
         String name;
@@ -38,9 +35,11 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = input.nextInt();
 
-        try(FileWriter stock_file = new FileWriter(productFile,true)){
+        try(PrintWriter stock_file = new PrintWriter(productFile)){
+
             String new_entry = String.format("%d; board game; %s; %s; %.2f; %d; %.2f; %d\n", product_id, type, name, price, stock, purchase_cost, num_players);
-            stock_file.write(new_entry);
+            stock_file.append(new_entry);
+
 
         }catch (IOException e){
             System.out.println("Error: Could not access the stock file");
@@ -49,7 +48,7 @@ public class Admin extends User{
         input.close();
     }
 
-    public void addAccessory(String productFile){
+    public void addAccessory(File productFile){
         Scanner input = new Scanner(System.in);
         int product_id;
         String name;
@@ -74,9 +73,9 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = input.nextInt();
 
-        try(FileWriter stock_file = new FileWriter(productFile, true)){
+        try(PrintWriter stock_file = new PrintWriter(productFile)){
             String new_entry = String.format("%d; accessory; %s; %s; %.2f; %d; %.2f; %s\n", product_id, type, name, price, stock, purchase_cost, compatibility);
-            stock_file.write(new_entry);
+            stock_file.append(new_entry);
 
         }catch (IOException e){
             System.out.println("Error: Could not access the stock file");
