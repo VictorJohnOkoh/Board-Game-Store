@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Demo {
-    public static void main(String[] args) {
+     static void main(String[] args) {
         File user_file = new File("UserAccount.txt");
         File product_file = new File("Stock.txt");
         ArrayList<User> userList = new ArrayList<>();
@@ -45,8 +45,8 @@ public class Demo {
         String postcode = contents[3].trim();
         String city = contents[4].trim();
         String role = contents[5].trim();
-        Customer customer = null;
-        Admin admin = null;
+        Customer customer;
+        Admin admin;
         Address address = new Address(housenum, postcode, city);
         if (role.equalsIgnoreCase("customer")) {
             customer = new Customer(id, name, address);

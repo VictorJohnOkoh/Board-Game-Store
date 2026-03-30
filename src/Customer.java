@@ -9,7 +9,7 @@ public class Customer extends User{
 
     public Customer(int id, String name, Address address){
         super(id, name, address, "customer");
-        basket = new ArrayList<Product>();
+        basket = new ArrayList<>();
     }
 
 
