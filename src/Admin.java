@@ -1,8 +1,5 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
-import java.io.PrintWriter;
 
 public class Admin extends User{
 
@@ -25,7 +22,7 @@ public class Admin extends User{
         System.out.print("Enter the board game's name: ");
         name = input.next();
         System.out.print("Enter the board game's type: ");
-        type = input.next();
+        type = input.next().toLowerCase();
         System.out.print("Enter the board game's price: ");
         price = input.nextDouble();
         System.out.print("Enter the board game's purchase cost: ");
@@ -35,9 +32,9 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = input.nextInt();
 
-        try(PrintWriter stock_file = new PrintWriter(productFile)){
+        try(PrintWriter stock_file = new PrintWriter(new FileWriter("Stock.txt", true))){
 
-            String new_entry = String.format("%d; board game; %s; %s; %.2f; %d; %.2f; %d\n", product_id, type, name, price, stock, purchase_cost, num_players);
+            String new_entry = String.format("\n%d; board game; %s; %s; %.2f; %d; %.2f; %d\n", product_id, type, name, price, stock, purchase_cost, num_players);
             stock_file.append(new_entry);
 
 
@@ -73,8 +70,8 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = input.nextInt();
 
-        try(PrintWriter stock_file = new PrintWriter(productFile)){
-            String new_entry = String.format("%d; accessory; %s; %s; %.2f; %d; %.2f; %s\n", product_id, type, name, price, stock, purchase_cost, compatibility);
+        try(PrintWriter stock_file = new PrintWriter(new FileWriter("Stock.txt", true))){
+            String new_entry = String.format("\n%d; accessory; %s; %s; %.2f; %d; %.2f; %s\n", product_id, type, name, price, stock, purchase_cost, compatibility);
             stock_file.append(new_entry);
 
         }catch (IOException e){
