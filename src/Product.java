@@ -11,7 +11,7 @@ public abstract class Product {
         category = productCategory;
         name = productName;
         pricing = price;
-        cost =purchaseCost;
+        cost = purchaseCost;
         stock = quantityInStock;
     }
 

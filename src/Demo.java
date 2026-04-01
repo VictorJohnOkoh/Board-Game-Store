@@ -29,11 +29,12 @@ public class Demo {
         }
         Admin admin = (Admin) userList.getFirst();
         Customer cust1 = (Customer) userList.get(1);
-        admin.addBoardGame(product_file);
+
         for (int i = 0; i<productList.size(); i++){
             cust1.addShopping(productList.get(i));
         }
         System.out.println(cust1.showBasket());
+        cust1.pay();
 
     }
 

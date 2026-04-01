@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class User {
-   final int userID;
+   private final int userID;
    private String name;
    private Address address;
-   final String role;
+   private final String role;
 
    public User(int id, String n, Address addr, String r){
        userID = id;

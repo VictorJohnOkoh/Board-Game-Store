@@ -2,27 +2,31 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Receipt {
+    LocalDate localdate = LocalDate.now();
     private double amount;
+    private String date = date = localdate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));;
     private String email;
-    private int cardNumber;
-    private String date;
     private Address address;
+    private int cardNumber;
 
-    public Receipt(double paying, String mail, int card, Address addr){
+    public Receipt(double paying, Address addr, String mail){
         amount = paying;
-        email = mail;
-        cardNumber = card;
         address = addr;
-        LocalDate localdate = LocalDate.now();
-        date = localdate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        email = mail;
 
+    }
+
+    public Receipt(double paying, Address addr, int card){
+        amount = paying;
+        address = addr;
+        cardNumber = card;
     }
 
     public String cardReceipt(){
-        return String.format("%.2f paid by Credit Card %d on %s. Billing Address: %s", amount, cardNumber, date, address.toString());
+        return String.format("£%.2f paid by Credit Card %d on %s. Billing Address: %s", amount, cardNumber, date, address.toString());
     }
 
     public String paypalReceipt(){
-        return String.format("%.2f paid via PayPal using %s on %s. Billing address: %s", amount, email, date, address.toString());
-    }
+        return String.format("£%.2f paid via PayPal using %s on %s. Billing address: %s", amount, email, date, address.toString());
+       }
 }

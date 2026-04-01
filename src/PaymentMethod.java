@@ -1,4 +1,4 @@
 public interface PaymentMethod {
 
-//    public Receipt processPayment(double total, Address address);
+    Receipt processPayment(double total, Address address);
 }
