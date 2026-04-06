@@ -1,4 +1,4 @@
 public enum ProductCategory {
     ACCESSORY,
-    BOARDGAME;
+    BOARDGAME
 }
