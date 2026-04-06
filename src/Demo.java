@@ -1,10 +1,11 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Demo {
-     static void main(String[] args) {
+     static void main(String[] args) throws IOException {
         File user_file = new File("UserAccount.txt");
         File product_file = new File("Stock.txt");
         ArrayList<User> userList = new ArrayList<>();
@@ -30,14 +31,16 @@ public class Demo {
         Admin admin = (Admin) userList.getFirst();
         Customer cust1 = (Customer) userList.get(1);
 
-        for (int i = 0; i<productList.size(); i++){
-            cust1.addShopping(productList.get(i));
-        }
-        System.out.println(cust1.showBasket());
-        cust1.pay();
+         for (int i = 0; i<productList.size(); i++){
+             cust1.addShopping(productList.get(i));
+         }
+         for (int i = 0; i<productList.size(); i++){
+             cust1.addShopping(productList.get(i));
+         }
+         System.out.println(cust1.showBasket());
+         cust1.pay();
 
     }
-
 
     private static User getUser(String[] contents) {
         int id = Integer.parseInt(contents[0].trim());

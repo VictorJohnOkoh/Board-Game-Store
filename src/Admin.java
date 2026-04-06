@@ -7,7 +7,7 @@ public class Admin extends User{
         super(id, name, address, "admin");
     }
 
-    public void addBoardGame(File productFile){
+    public void addBoardGame(){
         Scanner input = new Scanner(System.in);
         int product_id;
         String name;
@@ -45,7 +45,7 @@ public class Admin extends User{
         input.close();
     }
 
-    public void addAccessory(File productFile){
+    public void addAccessory(){
         Scanner input = new Scanner(System.in);
         int product_id;
         String name;
