@@ -1,9 +1,11 @@
+package Inventory;
+
 public abstract class Product {
-    private int ID;
-    private ProductCategory category;
-    private String name;
-    private double pricing;
-    private double cost;
+    private final int ID;
+    private final ProductCategory category;
+    private final String name;
+    private final double pricing;
+    private final double cost;
     private int stock;
 
     public Product(int productId, ProductCategory productCategory, String productName, double purchaseCost, int quantityInStock, double price){

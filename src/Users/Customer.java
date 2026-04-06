@@ -1,5 +1,5 @@
+package Users;
 /*TO-DO
-* Update pay method to update stock
 * Add search method
 *   Search for product ID
 *   Search for compatibility
@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import Inventory.*;
+
 
 public class Customer extends User{
     private final ArrayList<Product> basket = new ArrayList<>();

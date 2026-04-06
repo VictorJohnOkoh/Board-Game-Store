@@ -1,9 +1,10 @@
+package Inventory;
+
 import java.util.Scanner;
+import Users.Address;
 
 public class CreditCard implements PaymentMethod{
-
     private int cardNumber;
-    private int securityNumber;
 
     public CreditCard() {
         boolean pass = false;
@@ -21,6 +22,7 @@ public class CreditCard implements PaymentMethod{
         }
         pass = false;
         while (!pass) {
+            int securityNumber;
             System.out.print("Enter your 3 digit security number: ");
             securityNumber = scanner.nextInt();
             String test = String.format("%d", securityNumber).replaceAll("\\s+", "");

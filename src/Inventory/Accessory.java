@@ -1,3 +1,5 @@
+package Inventory;
+
 public class Accessory extends Product{
     final private String compatibility;
     final String type;
@@ -12,6 +14,6 @@ public class Accessory extends Product{
 
     @Override
     public String toString() {
-        return String.format("%d; %s; %s; %s; %.2f; %d; %.2f; %s", getProductID(), getCategory(), type, getProductName(), getPrice(), getQuantityInStock(), getPurchaseCost(), getCompatibility());
+        return String.format("%d; %s; %s; %s; %.2f; %d; %.2f; %s", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), getPurchaseCost(), getCompatibility());
     }
 }

@@ -1,3 +1,5 @@
+package Inventory;
+
 public class BoardGame extends Product{
     final private int num_players;
     final private String type;
@@ -11,7 +13,7 @@ public class BoardGame extends Product{
 
     @Override
     public String toString() {
-        return String.format("%d; %s; %s; %s; %.2f; %d; %.2f; %d", getProductID(), getCategory(), type, getProductName(), getPrice(), getQuantityInStock(), getPurchaseCost(), num_players);
+        return String.format("%d; %s; %s; %s; %.2f; %d; %.2f; %d", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), getPurchaseCost(), num_players);
     }
 
 }

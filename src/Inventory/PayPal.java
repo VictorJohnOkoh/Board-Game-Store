@@ -1,4 +1,7 @@
+package Inventory;
+
 import java.util.Scanner;
+import Users.Address;
 
 public class PayPal implements PaymentMethod{
 

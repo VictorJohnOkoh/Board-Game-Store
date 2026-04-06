@@ -1,9 +1,11 @@
+package Users;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class User {
+public abstract class User {
    private final int userID;
    private String name;
    private Address address;

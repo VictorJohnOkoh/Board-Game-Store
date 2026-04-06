@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import Inventory.*;
+import Users.*;
 
 public class Demo {
      static void main(String[] args) throws IOException {

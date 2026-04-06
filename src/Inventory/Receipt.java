@@ -1,12 +1,15 @@
+package Inventory;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import Users.Address;
 
 public class Receipt {
     LocalDate localdate = LocalDate.now();
-    private double amount;
-    private String date = date = localdate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));;
+    private final double amount;
+    private final String date  = localdate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     private String email;
-    private Address address;
+    private final Address address;
     private int cardNumber;
 
     public Receipt(double paying, Address addr, String mail){
@@ -23,7 +26,7 @@ public class Receipt {
     }
 
     public String cardReceipt(){
-        return String.format("£%.2f paid by Credit Card %d on %s. Billing Address: %s", amount, cardNumber, date, address.toString());
+        return String.format("£%.2f paid by Credit Card %d on %s. Billing Users.Address: %s", amount, cardNumber, date, address.toString());
     }
 
     public String paypalReceipt(){

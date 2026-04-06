@@ -1,7 +1,9 @@
+package Users;
+
 public class Address {
-    private int house_num;
-    private String postcode;
-    private String city;
+    private final int house_num;
+    private final String postcode;
+    private final String city;
 
     public Address(int hn, String pc, String c){
         house_num = hn;
