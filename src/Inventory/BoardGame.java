@@ -11,9 +11,15 @@ public class BoardGame extends Product{
     }
     public int getNum_players(){return num_players;}
 
+    // Full string representation of the board game
     @Override
     public String toString() {
         return String.format("%d; %s; %s; %s; %.2f; %d; %.2f; %d", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), getPurchaseCost(), num_players);
     }
 
+    public String partString()
+    {
+        return String.format("%d; %s; %s; %s; %.2f; %d; %d", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), num_players);
+
+    }
 }
