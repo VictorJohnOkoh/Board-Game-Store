@@ -1,6 +1,14 @@
 package Users;
 
+import Inventory.Accessory;
+import Inventory.BoardGame;
+import Inventory.Product;
+import Inventory.ProductCategory;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Admin extends User{
@@ -34,7 +42,7 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = input.nextInt();
 
-        try(PrintWriter stock_file = new PrintWriter(new FileWriter("Stock.txt", true))){
+        try(PrintWriter stock_file = new PrintWriter(new FileWriter(super.getStockFile(), true))){
 
             String new_entry = String.format("\n%d; board game; %s; %s; %.2f; %d; %.2f; %d\n", product_id, type, name, price, stock, purchase_cost, num_players);
             stock_file.append(new_entry);
@@ -72,7 +80,7 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = input.nextInt();
 
-        try(PrintWriter stock_file = new PrintWriter(new FileWriter("Stock.txt", true))){
+        try(PrintWriter stock_file = new PrintWriter(new FileWriter(super.getStockFile(), true))){
             String new_entry = String.format("\n%d; accessory; %s; %s; %.2f; %d; %.2f; %s\n", product_id, type, name, price, stock, purchase_cost, compatibility);
             stock_file.append(new_entry);
 
@@ -83,9 +91,43 @@ public class Admin extends User{
         input.close();
     }
 
+    // Allows the customer to view the list of available products in descending order of the unit price
+    public String viewProducts() throws IOException {
+        List<String> lines = Files.readAllLines(super.getStockFile().toPath());
+        ArrayList<List<String>> splitlines = new ArrayList<>();
+        for (String line : lines) {
+            splitlines.add(List.of(line.split(";")));
+        }
+        ArrayList<Product> listedProducts = loadProducts(splitlines);
+        ArrayList<Product> orderedLines = super.descOrder(listedProducts);
+        StringBuilder output = new StringBuilder();
+        for (Product line : orderedLines) {
+            if (line.getCategory().equals(ProductCategory.BOARDGAME)) {
+                BoardGame game = (BoardGame) line;
+                output.append(game.toString());
+            } else{
+                Accessory accessory = (Accessory) line;
+                output.append(accessory.toString());
+            }
+            output.append("\n");
+        }
+        return output.toString();
+    }
 
-
-
+    // Returns an arrayList of Products after being passed a 2D array from a line in the stock file
+    private static ArrayList<Product> loadProducts(ArrayList<List<String>> splitContents) {
+        ArrayList<Product> productList = new ArrayList<>();
+        for (List<String> list : splitContents) {
+            if (list.get(1).trim().equals("board game")) {
+                BoardGame newGame = new BoardGame(list.toArray(new String[0]));
+                productList.add(newGame);
+            } else {
+                Accessory newAccessory = new Accessory(list.toArray(new String[0]));
+                productList.add(newAccessory);
+            }
+        }
+        return productList;
+    }
 
 
 }
