@@ -33,15 +33,14 @@ public class Demo {
         Admin admin = (Admin) userList.getFirst();
         Customer cust1 = (Customer) userList.get(1);
 
-         for (int i = 0; i<productList.size(); i++){
-             cust1.addShopping(productList.get(i));
-         }
-         for (int i = 0; i<productList.size(); i++){
-             cust1.addShopping(productList.get(i));
-         }
-         System.out.println(cust1.showBasket());
-         cust1.pay();
-
+		 for (Product product : productList) {
+			 cust1.addShopping(product);
+		 }
+         Scanner scanner = new Scanner(System.in);
+         String searchQuery;
+         System.out.print("Enter search query: ");
+         searchQuery = scanner.next();
+         System.out.print(cust1.search(searchQuery));
     }
 
     private static User getUser(String[] contents) {
