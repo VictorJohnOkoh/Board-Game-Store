@@ -104,30 +104,14 @@ public class Admin extends User{
         for (Product line : orderedLines) {
             if (line.getCategory().equals(ProductCategory.BOARDGAME)) {
                 BoardGame game = (BoardGame) line;
-                output.append(game.toString());
+                output.append(game);
             } else{
                 Accessory accessory = (Accessory) line;
-                output.append(accessory.toString());
+                output.append(accessory);
             }
             output.append("\n");
         }
         return output.toString();
     }
-
-    // Returns an arrayList of Products after being passed a 2D array from a line in the stock file
-    private static ArrayList<Product> loadProducts(ArrayList<List<String>> splitContents) {
-        ArrayList<Product> productList = new ArrayList<>();
-        for (List<String> list : splitContents) {
-            if (list.get(1).trim().equals("board game")) {
-                BoardGame newGame = new BoardGame(list.toArray(new String[0]));
-                productList.add(newGame);
-            } else {
-                Accessory newAccessory = new Accessory(list.toArray(new String[0]));
-                productList.add(newAccessory);
-            }
-        }
-        return productList;
-    }
-
 
 }

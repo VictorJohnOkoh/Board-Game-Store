@@ -1,5 +1,7 @@
 package Users;
 
+import Inventory.Accessory;
+import Inventory.BoardGame;
 import Inventory.Product;
 
 import java.io.File;
@@ -68,4 +70,18 @@ public abstract class User {
         return list;
     }
 
+    // Returns an arrayList of Products after being passed a 2D array from a line in the stock file
+    protected ArrayList<Product> loadProducts(ArrayList<List<String>> splitContents) {
+        ArrayList<Product> productList = new ArrayList<>();
+        for (List<String> list : splitContents) {
+            if (list.get(1).trim().equals("board game")) {
+                BoardGame newGame = new BoardGame(list.toArray(new String[0]));
+                productList.add(newGame);
+            } else {
+                Accessory newAccessory = new Accessory(list.toArray(new String[0]));
+                productList.add(newAccessory);
+            }
+        }
+        return productList;
+    }
 }

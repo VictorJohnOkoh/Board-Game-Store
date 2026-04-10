@@ -33,14 +33,17 @@ public class Demo {
         Admin admin = (Admin) userList.getFirst();
         Customer cust1 = (Customer) userList.get(1);
 
-		 for (Product product : productList) {
-			 cust1.addShopping(product);
-		 }
+
          Scanner scanner = new Scanner(System.in);
-         String searchQuery;
-         System.out.print("Enter search query: ");
-         searchQuery = scanner.next();
-         System.out.print(cust1.search(searchQuery));
+         String inputStr;
+// Search UI
+         System.out.print("Search (either the Product ID or the compatibility NOT BOTH): ");
+         try{
+             int inputInt = Integer.parseInt(scanner.nextLine());
+             System.out.print(cust1.search(inputInt));
+         } catch (NumberFormatException e) {
+             System.out.print(cust1.search(scanner.nextLine()));
+         }
     }
 
     private static User getUser(String[] contents) {

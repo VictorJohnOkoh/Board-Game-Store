@@ -6,6 +6,7 @@ package Users;
 * */
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +24,7 @@ public class Customer extends User{
 
     // Allows the customer to view the list of available products in descending order of the unit price
     public String viewProducts() throws IOException {
-        List<String> lines = Files.readAllLines(super.getStockFile().toPath());
-        ArrayList<List<String>> splitlines = new ArrayList<>();
-        for (String line : lines) {
-            splitlines.add(List.of(line.split(";")));
-        }
-        ArrayList<Product> listedProducts = loadProducts(splitlines);
-        ArrayList<Product> orderedLines = super.descOrder(listedProducts);
+        ArrayList<Product> orderedLines = listProducts();
         StringBuilder output = new StringBuilder();
         for (Product line : orderedLines) {
             if (line.getCategory().equals(ProductCategory.BOARDGAME)) {
@@ -86,11 +81,11 @@ public class Customer extends User{
     }
 
     // Adds an item to the customer's basket
-    public void addShopping(Product item){
+    public void addShopping(int productID) throws IOException {
         boolean found = false;
         int index = 0;
         for (int i = 0; i< basket.size(); i++){
-            if (basket.get(i).getProductID() == item.getProductID()){
+            if (basket.get(i).getProductID() == productID){
                 found = true;
                 index = i;
             }
@@ -101,10 +96,27 @@ public class Customer extends User{
             amount.set(index, temp);
 
         } else {
-            basket.add(item);
-            amount.add(1);
+            ArrayList<Product> orderedLines = listProducts();
+            for (Product product : orderedLines) {
+                if (product.getProductID() == productID){
+                    basket.add(product);
+                    amount.add(1);
+                }
+            }
+
         }
 
+    }
+
+    private ArrayList<Product> listProducts() throws IOException {
+        List<String> lines = Files.readAllLines(super.getStockFile().toPath());
+        ArrayList<List<String>> splitlines = new ArrayList<>();
+        for (String line : lines) {
+            splitlines.add(List.of(line.split(";")));
+        }
+        ArrayList<Product> listedProducts = loadProducts(splitlines);
+        ArrayList<Product> orderedLines = super.descOrder(listedProducts);
+        return orderedLines;
     }
 
     // Empties the customer's basket
@@ -145,20 +157,6 @@ public class Customer extends User{
         }
     }
 
-    // Returns an arrayList of Products after being passed a 2D array from a line in the stock file
-    private static ArrayList<Product> loadProducts(ArrayList<List<String>> splitContents) {
-        ArrayList<Product> productList = new ArrayList<>();
-        for (List<String> list : splitContents) {
-            if (list.get(1).trim().equals("board game")) {
-                BoardGame newGame = new BoardGame(list.toArray(new String[0]));
-                productList.add(newGame);
-            } else {
-                Accessory newAccessory = new Accessory(list.toArray(new String[0]));
-                productList.add(newAccessory);
-            }
-        }
-        return productList;
-    }
 
     // processes payment then clears the customer's basket
     public void pay() throws IOException {
@@ -187,18 +185,12 @@ public class Customer extends User{
 
     // Filters via compatibility
     public String search(String term) throws IOException {
-        List<String> contents = Files.readAllLines(super.getStockFile().toPath());
-        ArrayList<List<String>> splitContents = new ArrayList<>();
-        for (String line : contents){
-            splitContents.add(List.of(line.split(";")));
-        }
-        ArrayList<Product> productList = loadProducts(splitContents);
-        ArrayList<Product> orderedProductList = super.descOrder(productList);
+        ArrayList<Product> orderedProductList = listProducts();
         ArrayList<Product> filteredProducts = new ArrayList<>();
         for (Product product : orderedProductList){
             if (product.getCategory().equals(ProductCategory.ACCESSORY)){
                 Accessory temp = (Accessory) product;
-                if (temp.getCompatibility().contains(term)){
+                if (temp.getCompatibility().toLowerCase().contains(term.toLowerCase())){
                     filteredProducts.add(product);
                 }
             }
@@ -212,13 +204,7 @@ public class Customer extends User{
         if (test.length() != 4){
             return "Invalid product ID";
         }
-        List<String> contents = Files.readAllLines(super.getStockFile().toPath());
-        ArrayList<List<String>> splitContents = new ArrayList<>();
-        for (String line : contents){
-            splitContents.add(List.of(line.split(";")));
-        }
-        ArrayList<Product> productList = loadProducts(splitContents);
-        ArrayList<Product> orderedProductList = super.descOrder(productList);
+        ArrayList<Product> orderedProductList = listProducts();
         ArrayList<Product> filteredProducts = new ArrayList<>();
         for (Product product : orderedProductList){
             if (product.getProductID() == term){
