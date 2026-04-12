@@ -92,7 +92,7 @@ public class Admin extends User{
     }
 
     // Allows the customer to view the list of available products in descending order of the unit price
-    public String viewProducts() throws IOException {
+    public void viewProducts() throws IOException {
         List<String> lines = Files.readAllLines(super.getStockFile().toPath());
         ArrayList<List<String>> splitlines = new ArrayList<>();
         for (String line : lines) {
@@ -111,7 +111,9 @@ public class Admin extends User{
             }
             output.append("\n");
         }
-        return output.toString();
     }
 
+    public String toString(){
+        return String.format("%d | %s | %s", getUserID(), getUserName(), getRole());
+    }
 }

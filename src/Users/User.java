@@ -6,7 +6,6 @@ import Inventory.Product;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +43,9 @@ public abstract class User {
        return address;
    }
 
-   public abstract String viewProducts() throws IOException;
+   public abstract String toString();
+
+   public abstract void viewProducts() throws IOException;
     /*
      Takes in an array of Products and sorts them into descending order of price
      then returns an array of Products

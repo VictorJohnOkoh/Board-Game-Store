@@ -6,7 +6,6 @@ package Users;
 * */
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class Customer extends User{
     }
 
     // Allows the customer to view the list of available products in descending order of the unit price
-    public String viewProducts() throws IOException {
+    public void viewProducts() throws IOException {
         ArrayList<Product> orderedLines = listProducts();
         StringBuilder output = new StringBuilder();
         for (Product line : orderedLines) {
@@ -36,7 +35,6 @@ public class Customer extends User{
             }
             output.append("\n");
         }
-        return output.toString();
     }
 
     // Passed a list of products then returns products as strings
@@ -78,6 +76,10 @@ public class Customer extends User{
             total += (product.getPrice()) * amount.get(i);
         }
         return total;
+    }
+
+    public String toString() {
+        return String.format("%d | %s | %s", getUserID(), getUserName(), getRole());
     }
 
     // Adds an item to the customer's basket
