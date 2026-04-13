@@ -14,13 +14,14 @@ public abstract class User {
    private String name;
    private Address address;
    private final String role;
-   private final static File stockFile = new File("Stock.txt");
+   private static File stockFile;
 
    public User(int id, String n, Address addr, String r){
        userID = id;
        name = n;
        address = addr;
        role = r;
+       stockFile = new File("Stock.txt");
    }
 
    public File getStockFile(){
@@ -45,7 +46,7 @@ public abstract class User {
 
    public abstract String toString();
 
-   public abstract void viewProducts() throws IOException;
+   public abstract String viewProducts() throws IOException;
     /*
      Takes in an array of Products and sorts them into descending order of price
      then returns an array of Products

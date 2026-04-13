@@ -22,7 +22,7 @@ public class Customer extends User{
     }
 
     // Allows the customer to view the list of available products in descending order of the unit price
-    public void viewProducts() throws IOException {
+    public String viewProducts() throws IOException {
         ArrayList<Product> orderedLines = listProducts();
         StringBuilder output = new StringBuilder();
         for (Product line : orderedLines) {
@@ -35,6 +35,7 @@ public class Customer extends User{
             }
             output.append("\n");
         }
+        return output.toString();
     }
 
     // Passed a list of products then returns products as strings
@@ -60,7 +61,7 @@ public class Customer extends User{
         StringBuilder basketContents = new StringBuilder();
         for (int i = 0; i< basket.size(); i++) {
             Product product = basket.get(i);
-            String new_content = (String.format("%-27s %5c £%.2f x%d", product.getProductName(), '|',product.getPrice(), amount.get(i)));
+            String new_content = (String.format("%-27s %5c £%.2f %c x%d", product.getProductName(), '|',product.getPrice(), '|',amount.get(i)));
             basketContents.append(new_content);
             basketContents.append("\n");
         }
@@ -117,8 +118,7 @@ public class Customer extends User{
             splitlines.add(List.of(line.split(";")));
         }
         ArrayList<Product> listedProducts = loadProducts(splitlines);
-        ArrayList<Product> orderedLines = super.descOrder(listedProducts);
-        return orderedLines;
+        return super.descOrder(listedProducts);
     }
 
     // Empties the customer's basket
@@ -189,6 +189,9 @@ public class Customer extends User{
     public String search(String term) throws IOException {
         ArrayList<Product> orderedProductList = listProducts();
         ArrayList<Product> filteredProducts = new ArrayList<>();
+        if (term.equals("e")){
+            return "";
+        }
         for (Product product : orderedProductList){
             if (product.getCategory().equals(ProductCategory.ACCESSORY)){
                 Accessory temp = (Accessory) product;
@@ -201,7 +204,7 @@ public class Customer extends User{
     }
 
     // Filters via product ID
-    public String search(int term) throws IOException{
+    public String search(int term) throws IOException, NumberFormatException{
         String test = String.format("%d", term).replaceAll("\\s+", "");
         if (test.length() != 4){
             return "Invalid product ID";
