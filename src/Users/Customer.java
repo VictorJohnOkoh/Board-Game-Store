@@ -183,6 +183,7 @@ public class Customer extends User{
             System.out.println("Invalid choice");
         }
         emptyBasket();
+        scanner.close();
     }
 
     // Filters via compatibility
