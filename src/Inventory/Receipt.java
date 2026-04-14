@@ -26,10 +26,10 @@ public class Receipt {
     }
 
     public String cardReceipt(){
-        return String.format("£%.2f paid by Credit Card %d on %s. Billing Users.Address: %s", amount, cardNumber, date, address.toString());
+        return String.format("£%.2f paid by Credit Card %d on %s. Billing Users.Address: %s\n", amount, cardNumber, date, address.toString());
     }
 
     public String paypalReceipt(){
-        return String.format("£%.2f paid via PayPal using %s on %s. Billing address: %s", amount, email, date, address.toString());
+        return String.format("£%.2f paid via PayPal using %s on %s. Billing address: %s\n", amount, email, date, address.toString());
        }
 }

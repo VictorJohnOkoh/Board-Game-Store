@@ -123,6 +123,7 @@ public class Customer extends User{
 
     // Empties the customer's basket
     public void emptyBasket(){
+        System.out.println("Basket cleared");
         basket.clear();
     }
 
@@ -149,41 +150,46 @@ public class Customer extends User{
         }
         try(PrintWriter out = new PrintWriter(super.getStockFile())){
             StringBuilder output = new StringBuilder();
-            for (int i = 0; i <basket.size(); i++){
+            for (int i = 0; i <productList.size(); i++){
                 output.append(productList.get(i).toString());
-                if (i < basket.size()-1){
+                if (i < productList.size()-1){
                     output.append("\n");
                 }
             }
             out.print(output);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
 
     // processes payment then clears the customer's basket
-    public void pay() throws IOException {
-        Scanner scanner = new Scanner(System.in);
+    public void pay(Scanner consoleInput) throws IOException {
         int choice;
 
         System.out.print("How would you like to pay?\n1. PayPal\n2. Credit Card\n3. Cancel\nChoice: ");
-        choice = scanner.nextInt();
+        choice = consoleInput.nextInt();
+
         if (choice == 1){
             PayPal paypalInst = new PayPal();
             Receipt receipt = paypalInst.processPayment(getTotalPrice(), getAddress());
             System.out.print(receipt.paypalReceipt());
             updateStock();
-        } else if (choice == 2) {
+        }
+        else if (choice == 2) {
             CreditCard creditInst = new CreditCard();
             Receipt receipt = creditInst.processPayment(getTotalPrice(), getAddress());
             System.out.print(receipt.cardReceipt());
             updateStock();
-        } else if (choice == 3) {
-            System.out.print("Payment cancelled");
-        } else {
+        }
+        else if (choice == 3) {
+            System.out.println("Payment cancelled");
+        }
+        else {
             System.out.println("Invalid choice");
         }
         emptyBasket();
-        scanner.close();
+
     }
 
     // Filters via compatibility

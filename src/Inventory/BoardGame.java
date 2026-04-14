@@ -19,7 +19,7 @@ public class BoardGame extends Product{
 
     public String partString()
     {
-        return String.format("%d; %s; %s; %s; %.2f; %d; %d", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), num_players);
+        return String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d|Number of Players: %d |", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), num_players);
 
     }
 }

@@ -18,7 +18,7 @@ public class Accessory extends Product{
     }
 
     public String partString(){
-        return String.format("%d; %s; %s; %s; %.2f; %d; %s", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), getCompatibility());
+        return String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d |Compatibility: %s |", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), getCompatibility());
 
     }
 }
