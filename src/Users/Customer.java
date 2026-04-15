@@ -1,9 +1,5 @@
 package Users;
-/*TO-DO
-* Add search method
-*   Search for product ID
-*   Search for compatibility
-* */
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -111,6 +107,7 @@ public class Customer extends User{
 
     }
 
+    // returns an ArrayList of Products in the Stock.txt file ordered by price
     private ArrayList<Product> listProducts() throws IOException {
         List<String> lines = Files.readAllLines(super.getStockFile().toPath());
         ArrayList<List<String>> splitlines = new ArrayList<>();
@@ -135,9 +132,6 @@ public class Customer extends User{
             splitContents.add(List.of(line.split(";")));
         }
         ArrayList<Product> productList = loadProducts(splitContents);
-        for (Product product : productList){
-            System.out.println(product.toString());
-        }
         for (int i = 0; i<basket.size(); i++){
             Product basketContent = basket.get(i);
             for (Product product : productList) {
@@ -148,6 +142,7 @@ public class Customer extends User{
                 }
             }
         }
+        // writes the updates stock to the Stock file
         try(PrintWriter out = new PrintWriter(super.getStockFile())){
             StringBuilder output = new StringBuilder();
             for (int i = 0; i <productList.size(); i++){
@@ -167,7 +162,7 @@ public class Customer extends User{
     public void pay(Scanner consoleInput) throws IOException {
         int choice;
 
-        System.out.print("How would you like to pay?\n1. PayPal\n2. Credit Card\n3. Cancel\nChoice: ");
+        System.out.println("How would you like to pay?\n1. PayPal\n2. Credit Card\n3. Cancel");
         choice = consoleInput.nextInt();
 
         if (choice == 1){
@@ -177,7 +172,7 @@ public class Customer extends User{
             updateStock();
         }
         else if (choice == 2) {
-            CreditCard creditInst = new CreditCard();
+            CreditCard creditInst = new CreditCard(consoleInput);
             Receipt receipt = creditInst.processPayment(getTotalPrice(), getAddress());
             System.out.print(receipt.cardReceipt());
             updateStock();

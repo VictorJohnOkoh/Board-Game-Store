@@ -11,6 +11,7 @@ public class PayPal implements PaymentMethod{
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter your PayPal email: ");
         email = scanner.next();
+        scanner.close();
     }
 
 
@@ -20,7 +21,4 @@ public class PayPal implements PaymentMethod{
         return new Receipt(total, address, email);
     }
 
-    public String getEmail(){
-        return email;
-    }
 }
