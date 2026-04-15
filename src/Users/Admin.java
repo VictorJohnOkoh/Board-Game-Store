@@ -66,7 +66,7 @@ public class Admin extends User{
     public void addAccessory(Scanner consoleInput){
         int product_id = 0;
         String name;
-        String type;
+        String type = "";
         double price;
         int stock;
         double purchase_cost;
@@ -85,13 +85,22 @@ public class Admin extends User{
         }
         System.out.print("Enter the accessory's name: ");
         name = consoleInput.nextLine();
-        System.out.print("Enter the accessory's type: ");
-        type = consoleInput.nextLine().toLowerCase();
+        System.out.println("What is the accessory's type: \n1) accessory kit 2) miniature 3) dice");
+        int choice = Integer.parseInt(consoleInput.nextLine());
+        if (choice == 1){
+            type = Accessory.ACCESSORY_KIT;
+        } else if (choice == 2){
+            type = Accessory.MINIATURE;
+        } else if (choice == 3){
+            type = Accessory.DICE;
+        } else {
+            System.out.println("Invalid choice");
+        }
         System.out.print("Enter the accessory's price: ");
         price = Double.parseDouble(consoleInput.nextLine());
         System.out.print("Enter the accessory's purchase cost: ");
         purchase_cost = Double.parseDouble(consoleInput.nextLine());
-        System.out.print("Enter the accessory's maximum number of players: ");
+        System.out.print("Enter the accessory's compatibility: ");
         compatibility = consoleInput.nextLine();
         System.out.print("Enter the amount of stock: ");
         stock = Integer.parseInt(consoleInput.nextLine());
