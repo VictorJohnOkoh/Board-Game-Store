@@ -2,8 +2,8 @@
 1908; board game; party; Quick Draw Chaos; 25.00; 35; 12.00; 8
 6723; board game; strategy; Galactic Dominion; 55.00; 15; 30.00; 5
 8251; board game; party; Mystery Mansion; 32.00; 22; 18.00; 6
-7412; accessory; playmat; Mystic Realm Playmat; 20.00; 40; 8.00; Universal
-4935; accessory; playmat; Tactical Grid Playmat; 22.00; 30; 10.00; Universal
+7412; accessory; accessory kit; Mystic Realm Playmat; 20.00; 40; 8.00; Universal
+4935; accessory; accessory kit; Tactical Grid Playmat; 22.00; 30; 10.00; Universal
 2039; accessory; miniature; Space Commander Figure; 18.00; 25; 7.00; Warhammer 40K
 7125; accessory; miniature; Ancient Warrior Model; 15.00; 28; 6.00; Ancient Battles
 7381; accessory; dice; 7-piece Polyhedral Dice Set; 12.00; 50; 5.00; Dungeons & Dragons
