@@ -17,9 +17,8 @@ public class Admin extends User{
         super(id, name, address, "admin");
     }
 
-    public void addBoardGame(){
-        Scanner input = new Scanner(System.in);
-        int product_id;
+    public void addBoardGame(Scanner consoleInput){
+        int product_id = 0;
         String name;
         String type;
         double price;
@@ -27,24 +26,34 @@ public class Admin extends User{
         double purchase_cost;
         int num_players;
 
-        System.out.print("Enter the board game's ID: ");
-        product_id = input.nextInt();
+        boolean pass = false;
+        while (!pass) {
+            System.out.print("Enter the board game's ID: ");
+            product_id = Integer.parseInt(consoleInput.nextLine());
+            String test = String.format("%d", product_id);
+            if (test.length() != 4) {
+                System.out.println("Incorrect length");
+            } else {
+                pass = true;
+            }
+        }
         System.out.print("Enter the board game's name: ");
-        name = input.next();
+        name = consoleInput.nextLine();
         System.out.print("Enter the board game's type: ");
-        type = input.next().toLowerCase();
+        type = consoleInput.nextLine().toLowerCase();
         System.out.print("Enter the board game's price: ");
-        price = input.nextDouble();
+        price = Double.parseDouble(consoleInput.nextLine());
         System.out.print("Enter the board game's purchase cost: ");
-        purchase_cost = input.nextDouble();
+        purchase_cost = Double.parseDouble(consoleInput.nextLine());
         System.out.print("Enter the board game's maximum number of players: ");
-        num_players = input.nextInt();
+        num_players = Integer.parseInt(consoleInput.nextLine());
         System.out.print("Enter the amount of stock: ");
-        stock = input.nextInt();
+        stock = Integer.parseInt(consoleInput.nextLine());
+
 
         try(PrintWriter stock_file = new PrintWriter(new FileWriter(super.getStockFile(), true))){
 
-            String new_entry = String.format("\n%d; board game; %s; %s; %.2f; %d; %.2f; %d\n", product_id, type, name, price, stock, purchase_cost, num_players);
+            String new_entry = String.format("\n%d; board game; %s; %s; %.2f; %d; %.2f; %d", product_id, type, name, price, stock, purchase_cost, num_players);
             stock_file.append(new_entry);
 
 
@@ -52,12 +61,10 @@ public class Admin extends User{
             System.out.println("Error: Could not access the stock file");
         }
 
-        input.close();
     }
 
-    public void addAccessory(){
-        Scanner input = new Scanner(System.in);
-        int product_id;
+    public void addAccessory(Scanner consoleInput){
+        int product_id = 0;
         String name;
         String type;
         double price;
@@ -65,30 +72,38 @@ public class Admin extends User{
         double purchase_cost;
         String compatibility;
 
-        System.out.print("Enter the accessory's ID: ");
-        product_id = input.nextInt();
+        boolean pass = false;
+        while (!pass) {
+            System.out.print("Enter the accessory's ID: ");
+            product_id = Integer.parseInt(consoleInput.nextLine());
+            String test = String.format("%d", product_id);
+            if (test.length() != 4) {
+                System.out.println("Incorrect length");
+            } else {
+                pass = true;
+            }
+        }
         System.out.print("Enter the accessory's name: ");
-        name = input.next();
+        name = consoleInput.nextLine();
         System.out.print("Enter the accessory's type: ");
-        type = input.next();
+        type = consoleInput.nextLine().toLowerCase();
         System.out.print("Enter the accessory's price: ");
-        price = input.nextDouble();
+        price = Double.parseDouble(consoleInput.nextLine());
         System.out.print("Enter the accessory's purchase cost: ");
-        purchase_cost = input.nextDouble();
-        System.out.print("Enter the accessory's compatibility: ");
-        compatibility = input.next();
+        purchase_cost = Double.parseDouble(consoleInput.nextLine());
+        System.out.print("Enter the accessory's maximum number of players: ");
+        compatibility = consoleInput.nextLine();
         System.out.print("Enter the amount of stock: ");
-        stock = input.nextInt();
+        stock = Integer.parseInt(consoleInput.nextLine());
 
         try(PrintWriter stock_file = new PrintWriter(new FileWriter(super.getStockFile(), true))){
-            String new_entry = String.format("\n%d; accessory; %s; %s; %.2f; %d; %.2f; %s\n", product_id, type, name, price, stock, purchase_cost, compatibility);
+            String new_entry = String.format("\n%d; accessory; %s; %s; %.2f; %d; %.2f; %s", product_id, type, name, price, stock, purchase_cost, compatibility);
             stock_file.append(new_entry);
 
         }catch (IOException e){
             System.out.println("Error: Could not access the stock file");
         }
 
-        input.close();
     }
 
     // Allows the customer to view the list of available products in descending order of the unit price
