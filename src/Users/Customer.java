@@ -120,7 +120,7 @@ public class Customer extends User{
 
     // Empties the customer's basket
     public void emptyBasket(){
-        System.out.println("Basket cleared");
+        System.out.println("Basket cleared\n");
         basket.clear();
     }
 
@@ -164,9 +164,10 @@ public class Customer extends User{
 
         System.out.println("How would you like to pay?\n1. PayPal\n2. Credit Card\n3. Cancel");
         choice = consoleInput.nextInt();
+        consoleInput.nextLine();
 
         if (choice == 1){
-            PayPal paypalInst = new PayPal();
+            PayPal paypalInst = new PayPal(consoleInput);
             Receipt receipt = paypalInst.processPayment(getTotalPrice(), getAddress());
             System.out.print(receipt.paypalReceipt());
             updateStock();
@@ -207,6 +208,7 @@ public class Customer extends User{
 
     // Filters via product ID
     public String search(int term) throws IOException, NumberFormatException{
+        boolean found = false;
         String test = String.format("%d", term).replaceAll("\\s+", "");
         if (test.length() != 4){
             return "Invalid product ID";
@@ -216,7 +218,11 @@ public class Customer extends User{
         for (Product product : orderedProductList){
             if (product.getProductID() == term){
                 filteredProducts.add(product);
+                found = true;
             }
+        }
+        if (!found){
+            System.out.println("The provided product ID is not in store");
         }
         return viewProducts(filteredProducts);
     }

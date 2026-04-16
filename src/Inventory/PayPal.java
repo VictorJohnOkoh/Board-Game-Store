@@ -7,11 +7,10 @@ public class PayPal implements PaymentMethod{
 
     private final String email;
 
-    public PayPal (){
-        Scanner scanner = new Scanner(System.in);
+    public PayPal (Scanner consoleInput){
         System.out.print("Enter your PayPal email: ");
-        email = scanner.next();
-        scanner.close();
+        email = consoleInput.nextLine();
+
     }
 
 

@@ -38,10 +38,17 @@ public class Main {
 			if (line == null){
 				System.out.println("Please enter a valid option");
 			} else {
-				selection = Integer.parseInt(line.trim());
+				try {
+					selection = Integer.parseInt(line.trim());
+				} catch (NumberFormatException e){
+					System.out.println("Please enter a valid option");
+					selection = -1;
+				}
 			}
 
-
+			if (selection == -1){
+				continue;
+			}
 			if (selection == 0) {
 				System.out.println("Goodbye");
 				System.out.println("Closing program...");

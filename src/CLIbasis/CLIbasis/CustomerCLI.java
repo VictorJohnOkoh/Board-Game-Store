@@ -1,6 +1,5 @@
 package CLIbasis.CLIbasis;
 
-/*REMINDER: Can only search for product ID or compatibility (NOT BOTH)*/
 
 import Users.Customer;
 
@@ -14,9 +13,8 @@ public class CustomerCLI {
         System.out.println("CUSTOMER VIEW");
         while (true) {
             printCustomerMenu();
-            int choice = consoleInput.nextInt();
-            consoleInput.nextLine();
-            switch (choice) {
+            int choice = Integer.parseInt(consoleInput.nextLine());
+                switch (choice) {
             case 1:
                 System.out.println(customer.viewProducts());
                 break;
@@ -30,7 +28,7 @@ public class CustomerCLI {
                 break;
             case 4:
                 customer.pay(consoleInput);
-                consoleInput.nextLine();
+                System.out.println();
                 break;
             case 5:
                 customer.emptyBasket();
@@ -49,7 +47,6 @@ public class CustomerCLI {
                 System.out.println();
                 break;
             case 0:
-                consoleInput.nextLine();
                 return;
 
             }
