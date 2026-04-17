@@ -1,4 +1,4 @@
-package Inventory;
+package Payment;
 
 import java.util.Scanner;
 import Users.Address;

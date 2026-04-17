@@ -1,4 +1,4 @@
-package Inventory;
+package Payment;
 import Users.Address;
 
 public interface PaymentMethod {

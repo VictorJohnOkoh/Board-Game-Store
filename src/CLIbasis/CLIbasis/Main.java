@@ -38,13 +38,11 @@ public class Main {
 					selection = Integer.parseInt(line.trim());
 				} catch (NumberFormatException e){
 					System.out.println("Please enter a valid option");
-					selection = -1;
+					continue;
 				}
 			}
 
-			if (selection == -1){
-				continue;
-			}
+			
 			if (selection == 0) {
 				System.out.println("Goodbye");
 				System.out.println("Closing program...");
@@ -58,7 +56,7 @@ public class Main {
 						Admin admin = (Admin) userList.get(selection-1);
 						AdminCLI.run(consoleInput, admin);
 					} else {
-						Customer customer = (Customer) userList.get(selection);
+						Customer customer = (Customer) userList.get(selection-1);
 						CustomerCLI.run(consoleInput, customer);
 					}
 				} else {

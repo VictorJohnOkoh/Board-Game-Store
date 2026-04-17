@@ -1,4 +1,4 @@
-package Inventory;
+package Payment;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

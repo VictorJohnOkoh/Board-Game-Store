@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import Inventory.*;
+import Payment.CreditCard;
+import Payment.PayPal;
+import Payment.Receipt;
 
 
 public class Customer extends User{
@@ -34,7 +37,7 @@ public class Customer extends User{
         return output.toString();
     }
 
-    // Passed a list of products then returns products as strings
+    // Passed a list of products then returns products as strings, for viewing filtered items
     private String viewProducts(ArrayList<Product> products){
         StringBuilder output = new StringBuilder();
         for (Product product : products){
