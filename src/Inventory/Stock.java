@@ -22,8 +22,6 @@ public class Stock {
         }
     }
 
-    public Stock() throws IOException {
-    }
 
     public static File getStockFile() {
         return stockFile;
@@ -87,11 +85,11 @@ public class Stock {
         for (Product product : loadedProducts) {
             if (product.getCategory().equals(ProductCategory.BOARDGAME)){
                 BoardGame boardGame = (BoardGame) product;
-                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d|Number of Players: %d |", product.getProductID(), product.getCategory(), boardGame.getType(), product.getProductName(), product.getPrice(), product.getQuantityInStock(), boardGame.getNum_players());
+                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Stock: %d|Number of Players: %d |", product.getProductID(), product.getCategory(), boardGame.getType(), product.getProductName(), product.getPrice(), product.getQuantityInStock(), boardGame.getNum_players());
                 contents.append(new_entry);
             } else {
                 Accessory accessory = (Accessory) product;
-                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d|Compatibility: %s |", product.getProductID(), product.getCategory(), accessory.getType(), product.getProductName(), product.getPrice(), product.getQuantityInStock(), accessory.getCompatibility());
+                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Stock: %d|Compatibility: %s |", product.getProductID(), product.getCategory(), accessory.getType(), product.getProductName(), product.getPrice(), product.getQuantityInStock(), accessory.getCompatibility());
                 contents.append(new_entry);
             }
             contents.append("\n");
@@ -104,11 +102,11 @@ public class Stock {
         for (Product product : loadedProducts) {
             if (product.getCategory().equals(ProductCategory.BOARDGAME)){
                 BoardGame boardGame = (BoardGame) product;
-                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Number of Players: %d |", product.getProductID(), product.getCategory(), boardGame.getType(), product.getProductName(), product.getPrice(), product.getPurchaseCost(),product.getQuantityInStock(), boardGame.getNum_players());
+                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Number of Players: %d |", product.getProductID(), product.getCategory(), boardGame.getType(), product.getProductName(), product.getPrice(), product.getPurchaseCost(),product.getQuantityInStock(), boardGame.getNum_players());
                 contents.append(new_entry);
             } else {
                 Accessory accessory = (Accessory) product;
-                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Compatibility: %s |",
+                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Compatibility: %s |",
                         product.getProductID(), product.getCategory(), accessory.getType(), product.getProductName(), product.getPrice(), product.getPurchaseCost(),product.getQuantityInStock(), accessory.getCompatibility());
                 contents.append(new_entry);
             }
@@ -148,15 +146,16 @@ public class Stock {
 
     }
 
-    public void addStock(Product product){
+    public void addStock(Product product) throws IOException {
         try(
             PrintWriter stock_file = new PrintWriter(new FileWriter(stockFile, true))){
             String new_entry = "\n" + product.toString();
             stock_file.append(new_entry);
-
+            updateLoadedProducts();
         }catch (IOException e){
             System.out.println("Error: Could not access the stock file");
         }
+        updateLoadedProducts();
     }
 
     public static ArrayList<Product> getLoadedProducts() {

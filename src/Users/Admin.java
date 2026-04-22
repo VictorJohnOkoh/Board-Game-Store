@@ -16,7 +16,7 @@ public class Admin extends User{
         super(id, name, address, "admin");
     }
 
-    public void addBoardGame(Scanner consoleInput){
+    public void addBoardGame(Scanner consoleInput) throws IOException {
         int product_id = 0;
         String name;
         String type;
@@ -54,7 +54,7 @@ public class Admin extends User{
 
     }
 
-    public void addAccessory(Scanner consoleInput){
+    public void addAccessory(Scanner consoleInput) throws IOException {
         int product_id = 0;
         String name;
         String type = "";
