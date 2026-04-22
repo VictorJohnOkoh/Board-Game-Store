@@ -76,6 +76,10 @@ public class Stock {
         ArrayList<Product> listedProducts = loadProducts(splitlines);
         return descOrder(listedProducts);
     }
+    // updates the loadedProducts attribute after the stock file has been changed so it is reflected when user views stock
+    private void updateLoadedProducts() throws IOException {
+        loadedProducts = listProducts();
+    }
 
     // Shows all products currently stocked
     public String showStockCustomer(){
@@ -90,6 +94,7 @@ public class Stock {
                 String new_entry = String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d|Compatibility: %s |", product.getProductID(), product.getCategory(), accessory.getType(), product.getProductName(), product.getPrice(), product.getQuantityInStock(), accessory.getCompatibility());
                 contents.append(new_entry);
             }
+            contents.append("\n");
         }
         return contents.toString();
     }
@@ -99,19 +104,20 @@ public class Stock {
         for (Product product : loadedProducts) {
             if (product.getCategory().equals(ProductCategory.BOARDGAME)){
                 BoardGame boardGame = (BoardGame) product;
-                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Number of Players: %d |", product.getProductID(), product.getCategory(), boardGame.getType(), product.getProductName(), product.getPrice(), product.getPurchaseCost(),product.getQuantityInStock(), boardGame.getNum_players());
+                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Number of Players: %d |", product.getProductID(), product.getCategory(), boardGame.getType(), product.getProductName(), product.getPrice(), product.getPurchaseCost(),product.getQuantityInStock(), boardGame.getNum_players());
                 contents.append(new_entry);
             } else {
                 Accessory accessory = (Accessory) product;
-                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Compatibility: %s |",
+                String new_entry = String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %s |Price: %.2f |Purchase Cost: %.2f |Stock: %d|Compatibility: %s |",
                         product.getProductID(), product.getCategory(), accessory.getType(), product.getProductName(), product.getPrice(), product.getPurchaseCost(),product.getQuantityInStock(), accessory.getCompatibility());
                 contents.append(new_entry);
             }
+            contents.append("\n");
         }
         return contents.toString();
     }
 
-    public void updateStock(Basket basket){
+    public void updateStock(Basket basket) throws IOException {
         ArrayList<Product> basketContents = basket.getBasket();
         ArrayList<Integer> amount = basket.getAmounts();
         for (int i = 0; i<basketContents.size(); i++){
@@ -137,6 +143,8 @@ public class Stock {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        updateLoadedProducts();
 
     }
 
