@@ -14,7 +14,14 @@ public class Accessory extends Product{
         type = line[2].trim();
     }
 
+    public Accessory(int productID, String Type, String productName, double price, double purchaseCost, int quantityInStock, String comp){
+        super(productID, ProductCategory.ACCESSORY, productName, purchaseCost, quantityInStock, price);
+        compatibility = comp;
+        type = Type;
+    }
+
     public String getCompatibility(){return compatibility;}
+    public String getType(){return type;}
 
     @Override
     public String toString() {
