@@ -95,7 +95,7 @@ public class Customer extends User{
 
     // Filters via compatibility
     public String search(String term) throws IOException {
-        ArrayList<Product> orderedProductList = stockClass.getLoadedProducts();
+        ArrayList<Product> orderedProductList = Stock.getLoadedProducts();
         ArrayList<Product> filteredProducts = new ArrayList<>();
         if (term.equals("e")){
             return "";
@@ -118,7 +118,7 @@ public class Customer extends User{
         if (test.length() != 4){
             return "Invalid product ID";
         }
-        ArrayList<Product> orderedProductList = stockClass.getLoadedProducts();
+        ArrayList<Product> orderedProductList = Stock.getLoadedProducts();
         ArrayList<Product> filteredProducts = new ArrayList<>();
         for (Product product : orderedProductList){
             if (product.getProductID() == term){

@@ -29,7 +29,7 @@ public class Accessory extends Product{
     }
 
     public String partString(){
-        return String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d |Compatibility: %s |", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), compatibility);
+        return String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Stock: %d |Compatibility: %s |", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), compatibility);
 
     }
 }
