@@ -20,7 +20,7 @@ public class CustomerCLI {
                 break;
             case 2:
                 System.out.print("Enter product ID: ");
-                customer.addShopping(Integer.parseInt(consoleInput.nextLine()));
+                customer.basket.addShopping(Integer.parseInt(consoleInput.nextLine()));
                 break;
             case 3:
                 System.out.println(customer.showBasket());
@@ -31,7 +31,7 @@ public class CustomerCLI {
                 System.out.println();
                 break;
             case 5:
-                customer.emptyBasket();
+                customer.basket.emptyBasket();
                 System.out.println();
                 break;
             case 6:

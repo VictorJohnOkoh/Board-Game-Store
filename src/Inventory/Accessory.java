@@ -14,7 +14,14 @@ public class Accessory extends Product{
         type = line[2].trim();
     }
 
+    public Accessory(int productID, String Type, String productName, double price, double purchaseCost, int quantityInStock, String comp){
+        super(productID, ProductCategory.ACCESSORY, productName, purchaseCost, quantityInStock, price);
+        compatibility = comp;
+        type = Type;
+    }
+
     public String getCompatibility(){return compatibility;}
+    public String getType(){return type;}
 
     @Override
     public String toString() {
@@ -22,7 +29,7 @@ public class Accessory extends Product{
     }
 
     public String partString(){
-        return String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d |Compatibility: %s |", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), compatibility);
+        return String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Stock: %d |Compatibility: %s |", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), compatibility);
 
     }
 }

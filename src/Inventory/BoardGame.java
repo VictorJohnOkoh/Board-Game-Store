@@ -9,7 +9,15 @@ public class BoardGame extends Product{
         num_players = Integer.parseInt(line[7].trim());
         type = line[2].trim();
     }
+
+    public BoardGame(int productID, String Type, String productName, double price, double purchaseCost, int quantityInStock, int numPlayers){
+        super(productID, ProductCategory.BOARDGAME, productName, purchaseCost, quantityInStock, price);
+        num_players = numPlayers;
+        type = Type;
+    }
+
     public int getNum_players(){return num_players;}
+    public String getType(){return type;}
 
     // Full string representation of the board game
     @Override
@@ -19,7 +27,7 @@ public class BoardGame extends Product{
 
     public String partString()
     {
-        return String.format("|Product ID: %d |Category: %s |Type: %s |Name: %s |Price: %.2f |Stock: %d|Number of Players: %d |", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), num_players);
+        return String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Stock: %d|Number of Players: %d |", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), num_players);
 
     }
 }

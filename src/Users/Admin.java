@@ -1,9 +1,6 @@
 package Users;
 
-import Inventory.Accessory;
-import Inventory.BoardGame;
-import Inventory.Product;
-import Inventory.ProductCategory;
+import Inventory.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,11 +10,13 @@ import java.util.Scanner;
 
 public class Admin extends User{
 
-    public Admin(int id, String name, Address address){
+    private final Stock stockClass = new Stock();
+
+    public Admin(int id, String name, Address address) throws IOException {
         super(id, name, address, "admin");
     }
 
-    public void addBoardGame(Scanner consoleInput){
+    public void addBoardGame(Scanner consoleInput) throws IOException {
         int product_id = 0;
         String name;
         String type;
@@ -50,20 +49,12 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = Integer.parseInt(consoleInput.nextLine());
 
-
-        try(PrintWriter stock_file = new PrintWriter(new FileWriter(super.getStockFile(), true))){
-
-            String new_entry = String.format("\n%d; board game; %s; %s; %.2f; %d; %.2f; %d", product_id, type, name, price, stock, purchase_cost, num_players);
-            stock_file.append(new_entry);
-
-
-        }catch (IOException e){
-            System.out.println("Error: Could not access the stock file");
-        }
+        Product product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
+        stockClass.addStock(product);
 
     }
 
-    public void addAccessory(Scanner consoleInput){
+    public void addAccessory(Scanner consoleInput) throws IOException {
         int product_id = 0;
         String name;
         String type = "";
@@ -105,37 +96,14 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = Integer.parseInt(consoleInput.nextLine());
 
-        try(PrintWriter stock_file = new PrintWriter(new FileWriter(super.getStockFile(), true))){
-            String new_entry = String.format("\n%d; accessory; %s; %s; %.2f; %d; %.2f; %s", product_id, type, name, price, stock, purchase_cost, compatibility);
-            stock_file.append(new_entry);
-
-        }catch (IOException e){
-            System.out.println("Error: Could not access the stock file");
-        }
+        Product product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
+        stockClass.addStock(product);
 
     }
 
     // Allows the customer to view the list of available products in descending order of the unit price
     public String viewProducts() throws IOException {
-        List<String> lines = Files.readAllLines(super.getStockFile().toPath());
-        ArrayList<List<String>> splitlines = new ArrayList<>();
-        for (String line : lines) {
-            splitlines.add(List.of(line.split(";")));
-        }
-        ArrayList<Product> listedProducts = loadProducts(splitlines);
-        ArrayList<Product> orderedLines = super.descOrder(listedProducts);
-        StringBuilder output = new StringBuilder();
-        for (Product line : orderedLines) {
-            if (line.getCategory().equals(ProductCategory.BOARDGAME)) {
-                BoardGame game = (BoardGame) line;
-                output.append(game);
-            } else{
-                Accessory accessory = (Accessory) line;
-                output.append(accessory);
-            }
-            output.append("\n");
-        }
-        return output.toString();
+        return stockClass.showStockAdmin();
     }
 
     public String toString(){
