@@ -12,7 +12,7 @@ import Payment.Receipt;
 public class Customer extends User{
     public final Basket basket = new Basket();
 
-    public Customer(int id, String name, Address address) throws IOException {
+    public Customer(int id, String name, Address address){
         super(id, name, address, "customer");
     }
 
