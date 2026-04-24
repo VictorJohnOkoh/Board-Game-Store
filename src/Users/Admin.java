@@ -3,16 +3,11 @@ package Users;
 import Inventory.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Admin extends User{
 
-    private final Stock stockClass = new Stock();
-
-    public Admin(int id, String name, Address address) throws IOException {
+    public Admin(int id, String name, Address address) {
         super(id, name, address, "admin");
     }
 
@@ -50,7 +45,7 @@ public class Admin extends User{
         stock = Integer.parseInt(consoleInput.nextLine());
 
         Product product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
-        stockClass.addStock(product);
+        User.stockClass.addStock(product);
 
     }
 
@@ -97,13 +92,13 @@ public class Admin extends User{
         stock = Integer.parseInt(consoleInput.nextLine());
 
         Product product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
-        stockClass.addStock(product);
+        User.stockClass.addStock(product);
 
     }
 
     // Allows the customer to view the list of available products in descending order of the unit price
-    public String viewProducts() throws IOException {
-        return stockClass.showStockAdmin();
+    public String viewProducts() {
+        return User.stockClass.showStockAdmin();
     }
 
     public String toString(){
