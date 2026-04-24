@@ -1,10 +1,7 @@
 package Users;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import Inventory.*;
 import Payment.CreditCard;
@@ -14,7 +11,6 @@ import Payment.Receipt;
 
 public class Customer extends User{
     public final Basket basket = new Basket();
-    private final Stock stockClass = new Stock();
 
     public Customer(int id, String name, Address address) throws IOException {
         super(id, name, address, "customer");
@@ -22,7 +18,7 @@ public class Customer extends User{
 
     // Allows the customer to view the list of available products in descending order of the unit price
     public String viewProducts() {
-        return stockClass.showStockCustomer();
+        return User.stockClass.showStockCustomer();
     }
 
     // Passed a list of products then returns products as strings, for viewing filtered items
@@ -59,7 +55,7 @@ public class Customer extends User{
 
     // Removes the amount of the product in the basket from the current stock
     private void updateStock() throws IOException {
-        stockClass.updateStock(basket);
+        User.stockClass.updateStock(basket);
     }
 
 

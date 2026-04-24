@@ -23,9 +23,6 @@ public class Stock {
     }
 
 
-    public static File getStockFile() {
-        return stockFile;
-    }
 
     // Returns an arrayList of Products after being passed a 2D array from a line in the stock file
     private static ArrayList<Product> loadProducts(ArrayList<List<String>> splitContents) {
