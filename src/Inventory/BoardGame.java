@@ -16,7 +16,7 @@ public class BoardGame extends Product{
         type = Type;
     }
 
-    public int getNum_players(){return num_players;}
+    public int getNumPlayers(){return num_players;}
     public String getType(){return type;}
 
     // Full string representation of the board game
