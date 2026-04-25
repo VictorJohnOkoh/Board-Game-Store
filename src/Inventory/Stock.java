@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Stock {
-    private static final File stockFile = new File("Stock.txt");
+    private static final File stockFile = new File("Board Game Store" + File.separator + "Stock.txt");
     private static ArrayList<Product> loadedProducts = new ArrayList<>();
 
     static {
