@@ -22,8 +22,6 @@ public abstract class User {
        role = r;
    }
 
-
-
    public String getRole(){
        return role;
    }
@@ -40,11 +38,13 @@ public abstract class User {
        return address;
    }
 
+   // returns a string representation of the user's information
    public abstract String toString();
 
+   // allows user to see al products in the stock file
    public abstract String viewProducts() throws IOException;
 
-
+    // loads all users into an arraylist
     public static ArrayList<User> loadUsers() throws IOException {
         File userFile = new File("Board Game Store" + File.separator + "UserAccount.txt");
         List<String> lines = Files.readAllLines(userFile.toPath());

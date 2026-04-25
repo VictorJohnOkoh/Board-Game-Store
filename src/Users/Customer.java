@@ -43,14 +43,9 @@ public class Customer extends User{
         return basket.showBasket();
     }
 
-
     public String toString() {
         return String.format("%d | %s | %s", getUserID(), getUserName(), getRole());
     }
-
-
-
-
 
 
     // Removes the amount of the product in the basket from the current stock
