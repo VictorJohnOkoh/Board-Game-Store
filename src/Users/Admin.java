@@ -11,6 +11,7 @@ public class Admin extends User{
         super(id, name, address, "admin");
     }
 
+    // adds a boardgame to the stock file
     public void addBoardGame(Scanner consoleInput) throws IOException {
         int product_id = 0;
         String name;
@@ -49,6 +50,7 @@ public class Admin extends User{
 
     }
 
+    // adds an accessory to the stock file
     public void addAccessory(Scanner consoleInput) throws IOException {
         int product_id = 0;
         String name;
@@ -96,7 +98,7 @@ public class Admin extends User{
 
     }
 
-    // Allows the customer to view the list of available products in descending order of the unit price
+
     public String viewProducts() {
         return User.stockClass.showStockAdmin();
     }
