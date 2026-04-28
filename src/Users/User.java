@@ -46,7 +46,7 @@ public abstract class User {
 
     // loads all users into an arraylist
     public static ArrayList<User> loadUsers() throws IOException {
-        File userFile = new File("Board Game Store" + File.separator + "UserAccount.txt");
+        File userFile = new File("UserAccount.txt");
         List<String> lines = Files.readAllLines(userFile.toPath());
         ArrayList<List<String>> splitlines = new ArrayList<>();
         for (String line : lines) {

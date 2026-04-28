@@ -8,6 +8,9 @@ import Payment.CreditCard;
 import Payment.PayPal;
 import Payment.Receipt;
 
+/* stop customer from buying more products than in stock
+ * stop customer from buying products out of stock
+ */
 
 public class Customer extends User{
     public final Basket basket = new Basket();
@@ -25,7 +28,7 @@ public class Customer extends User{
     private String viewProducts(ArrayList<Product> products){
         StringBuilder output = new StringBuilder();
         for (Product product : products){
-            if (product.getCategory().equals(ProductCategory.BOARDGAME)){
+            if (product.getProductCategory().equals(ProductCategory.BOARDGAME)){
                 BoardGame game = (BoardGame) product;
                 output.append(game.partString());
                 output.append("\n");
@@ -92,7 +95,7 @@ public class Customer extends User{
             return "";
         }
         for (Product product : orderedProductList){
-            if (product.getCategory().equals(ProductCategory.ACCESSORY)){
+            if (product.getProductCategory().equals(ProductCategory.ACCESSORY)){
                 Accessory temp = (Accessory) product;
                 if (temp.getCompatibility().toLowerCase().contains(term.toLowerCase())){
                     filteredProducts.add(product);

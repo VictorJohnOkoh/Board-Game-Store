@@ -1,16 +1,16 @@
 package Inventory;
 
 public abstract class Product {
-    private final int ID;
-    private final ProductCategory category;
+    private final int productID;
+    private final ProductCategory productCategory;
     private final String name;
     private final double pricing;
     private final double cost;
     private int stock;
 
-    public Product(int productId, ProductCategory productCategory, String productName, double purchaseCost, int quantityInStock, double price){
-        ID = productId;
-        category = productCategory;
+    public Product(int productId, ProductCategory category, String productName, double purchaseCost, int quantityInStock, double price){
+        productID = productId;
+        productCategory = category;
         name = productName;
         pricing = price;
         cost = purchaseCost;
@@ -18,7 +18,7 @@ public abstract class Product {
     }
 
     public int getProductID() {
-        return ID;
+        return productID;
     }
     public double getPrice() {
         return pricing;
@@ -29,8 +29,8 @@ public abstract class Product {
     public String getProductName(){
         return name;
     }
-    public ProductCategory getCategory(){
-        return category;
+    public ProductCategory getProductCategory(){
+        return productCategory;
     }
     public int getQuantityInStock() {
         return stock;
