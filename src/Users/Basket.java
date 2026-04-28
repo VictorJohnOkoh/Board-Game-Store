@@ -44,6 +44,10 @@ public class Basket {
             if (basket.get(i).getProductID() == productID){
                 found = true;
                 index = i;
+                if (basket.get(i).getQuantityInStock() == 0){
+                    System.out.println("This product is currently out of stock");
+                    return;
+                }
             }
         }
         if (found){

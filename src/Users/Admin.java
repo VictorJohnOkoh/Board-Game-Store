@@ -5,8 +5,6 @@ import Inventory.*;
 import java.io.*;
 import java.util.Scanner;
 
-// add check to prevent products with same ID being added
-
 
 public class Admin extends User{
 
