@@ -23,7 +23,6 @@ public class Stock {
     }
 
 
-
     // Returns an arrayList of Products after being passed a 2D array from a line in the stock file
     private static ArrayList<Product> loadProducts(ArrayList<List<String>> splitContents) {
         ArrayList<Product> productList = new ArrayList<>();
@@ -179,4 +178,26 @@ public class Stock {
         }
         return conflict;
     }
+
+    // either checks if a single product passed is still in stock or all products in a basket, returns false if it isn't in stock
+    public static boolean checkStock(Product product){
+		return product.getQuantityInStock() != 0;
+	}
+
+    public static boolean checkStock(Basket basket){
+        ArrayList<Integer> amountList = basket.getAmounts();
+        StringBuilder outOfStock = new StringBuilder();
+        boolean outOfQuantity = false;
+        for (Product product : basket.getBasket()){
+            int amountInStock =  product.getQuantityInStock();
+            int quantityWanted = amountList.get(basket.getBasket().indexOf(product));
+            if (amountInStock < quantityWanted){
+                outOfStock.append(product.getProductName()).append(",");
+                outOfQuantity = true;
+            }
+        }
+        System.out.println(outOfStock);
+		return outOfQuantity;
+	}
+
 }

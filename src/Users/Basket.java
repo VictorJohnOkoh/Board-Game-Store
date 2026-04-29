@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Basket {
     private final ArrayList<Product> basket = new ArrayList<>();
-    private final ArrayList<Integer> amount = new ArrayList<>(); // amount index matches the index of the related product in the basket
+    private ArrayList<Integer> amount = new ArrayList<>(); // amount index matches the index of the related product in the basket
 
     public ArrayList<Product> getBasket() {
         return basket;
@@ -59,9 +59,13 @@ public class Basket {
             ArrayList<Product> orderedLines = Stock.getLoadedProducts();
             for (Product product : orderedLines) {
                 if (product.getProductID() == productID){
-                    basket.add(product);
-                    amount.add(1);
-                }
+					if (Stock.checkStock(product)) {
+						basket.add(product);
+						amount.add(1);
+					} else {
+                        System.out.println("This product is currently out of stock.");
+                    }
+				}
             }
 
         }
@@ -75,6 +79,10 @@ public class Basket {
             total += (product.getPrice()) * amount.get(i);
         }
         return total;
+    }
+
+    public void changeAmount(int index, int newAmount){
+        amount.set(index, newAmount);
     }
 
 }

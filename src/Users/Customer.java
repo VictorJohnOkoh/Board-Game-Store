@@ -8,7 +8,8 @@ import Payment.CreditCard;
 import Payment.PayPal;
 import Payment.Receipt;
 
-/* stop customer from buying more products than in stock
+/*
+ * stop customer from buying more products than in stock
  * stop customer from buying products out of stock
  */
 
@@ -66,17 +67,25 @@ public class Customer extends User{
         consoleInput.nextLine();
 
         if (choice == 1){
-            PayPal paypalInst = new PayPal(consoleInput);
-            Receipt receipt = paypalInst.processPayment(basket.getTotalPrice(), getAddress());
-            System.out.print(receipt.paypalReceipt());
-            updateStock();
-        }
+			if (Stock.checkStock(basket)) {
+				PayPal paypalInst = new PayPal(consoleInput);
+				Receipt receipt = paypalInst.processPayment(basket.getTotalPrice(), getAddress());
+				System.out.print(receipt.paypalReceipt());
+				updateStock();
+			} else {
+                return;
+            }
+		}
         else if (choice == 2) {
-            CreditCard creditInst = new CreditCard(consoleInput);
-            Receipt receipt = creditInst.processPayment(basket.getTotalPrice(), getAddress());
-            System.out.print(receipt.cardReceipt());
-            updateStock();
-        }
+			if (Stock.checkStock(basket)) {
+				CreditCard creditInst = new CreditCard(consoleInput);
+				Receipt receipt = creditInst.processPayment(basket.getTotalPrice(), getAddress());
+				System.out.print(receipt.cardReceipt());
+				updateStock();
+			} else {
+                return;
+            }
+		}
         else if (choice == 3) {
             System.out.println("Payment cancelled");
         }
