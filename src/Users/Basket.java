@@ -63,7 +63,7 @@ public class Basket {
 						basket.add(product);
 						amount.add(1);
 					} else {
-                        System.out.println("This product is currently out of stock.");
+                        System.out.println("This product is currently out of stock.\n");
                     }
 				}
             }

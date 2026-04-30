@@ -62,29 +62,29 @@ public class Customer extends User{
     public void pay(Scanner consoleInput) throws IOException {
         int choice;
 
+        if (!Stock.checkStock(this.basket)){
+            return;
+        }
+
         System.out.println("How would you like to pay?\n1. PayPal\n2. Credit Card\n3. Cancel");
         choice = consoleInput.nextInt();
         consoleInput.nextLine();
 
         if (choice == 1){
-			if (Stock.checkStock(basket)) {
-				PayPal paypalInst = new PayPal(consoleInput);
-				Receipt receipt = paypalInst.processPayment(basket.getTotalPrice(), getAddress());
-				System.out.print(receipt.paypalReceipt());
-				updateStock();
-			} else {
-                return;
-            }
+            PayPal paypalInst = new PayPal(consoleInput);
+            Receipt receipt = paypalInst.processPayment(basket.getTotalPrice(), getAddress());
+            System.out.print(receipt.paypalReceipt());
+            updateStock();
+            basket.emptyBasket();
+
 		}
         else if (choice == 2) {
-			if (Stock.checkStock(basket)) {
-				CreditCard creditInst = new CreditCard(consoleInput);
-				Receipt receipt = creditInst.processPayment(basket.getTotalPrice(), getAddress());
-				System.out.print(receipt.cardReceipt());
-				updateStock();
-			} else {
-                return;
-            }
+            CreditCard creditInst = new CreditCard(consoleInput);
+            Receipt receipt = creditInst.processPayment(basket.getTotalPrice(), getAddress());
+            System.out.print(receipt.cardReceipt());
+            updateStock();
+            basket.emptyBasket();
+
 		}
         else if (choice == 3) {
             System.out.println("Payment cancelled");
@@ -92,7 +92,7 @@ public class Customer extends User{
         else {
             System.out.println("Invalid choice");
         }
-        basket.emptyBasket();
+
 
     }
 

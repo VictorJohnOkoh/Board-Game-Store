@@ -179,25 +179,25 @@ public class Stock {
         return conflict;
     }
 
-    // either checks if a single product passed is still in stock or all products in a basket, returns false if it isn't in stock
+    // either checks if a single product passed is still in stock or there's enough stock for the products in a basket, returns false if it isn't in stock
     public static boolean checkStock(Product product){
 		return product.getQuantityInStock() != 0;
 	}
 
     public static boolean checkStock(Basket basket){
         ArrayList<Integer> amountList = basket.getAmounts();
-        StringBuilder outOfStock = new StringBuilder();
-        boolean outOfQuantity = false;
+        StringBuilder outOfStock = new StringBuilder("There aren't enough of these products in stock for your purchase:\n");
+        boolean enoughStock = true;
         for (Product product : basket.getBasket()){
             int amountInStock =  product.getQuantityInStock();
             int quantityWanted = amountList.get(basket.getBasket().indexOf(product));
             if (amountInStock < quantityWanted){
-                outOfStock.append(product.getProductName()).append(",");
-                outOfQuantity = true;
+                outOfStock.append(product.getProductName()).append("\n");
+                enoughStock = false;
             }
         }
         System.out.println(outOfStock);
-		return outOfQuantity;
+		return enoughStock;
 	}
 
 }
