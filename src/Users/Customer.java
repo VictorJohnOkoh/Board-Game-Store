@@ -25,7 +25,7 @@ public class Customer extends User{
     private String viewProducts(ArrayList<Product> products){
         StringBuilder output = new StringBuilder();
         for (Product product : products){
-            if (product.getCategory().equals(ProductCategory.BOARDGAME)){
+            if (product.getProductCategory().equals(ProductCategory.BOARDGAME)){
                 BoardGame game = (BoardGame) product;
                 output.append(game.partString());
                 output.append("\n");
@@ -58,6 +58,10 @@ public class Customer extends User{
     public void pay(Scanner consoleInput) throws IOException {
         int choice;
 
+        if (!Stock.checkStock(this.basket)){
+            return;
+        }
+
         System.out.println("How would you like to pay?\n1. PayPal\n2. Credit Card\n3. Cancel");
         choice = consoleInput.nextInt();
         consoleInput.nextLine();
@@ -67,20 +71,24 @@ public class Customer extends User{
             Receipt receipt = paypalInst.processPayment(basket.getTotalPrice(), getAddress());
             System.out.print(receipt.paypalReceipt());
             updateStock();
-        }
+            basket.emptyBasket();
+
+		}
         else if (choice == 2) {
             CreditCard creditInst = new CreditCard(consoleInput);
             Receipt receipt = creditInst.processPayment(basket.getTotalPrice(), getAddress());
             System.out.print(receipt.cardReceipt());
             updateStock();
-        }
+            basket.emptyBasket();
+
+		}
         else if (choice == 3) {
             System.out.println("Payment cancelled");
         }
         else {
             System.out.println("Invalid choice");
         }
-        basket.emptyBasket();
+
 
     }
 
@@ -92,7 +100,7 @@ public class Customer extends User{
             return "";
         }
         for (Product product : orderedProductList){
-            if (product.getCategory().equals(ProductCategory.ACCESSORY)){
+            if (product.getProductCategory().equals(ProductCategory.ACCESSORY)){
                 Accessory temp = (Accessory) product;
                 if (temp.getCompatibility().toLowerCase().contains(term.toLowerCase())){
                     filteredProducts.add(product);

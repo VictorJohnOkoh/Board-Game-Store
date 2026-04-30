@@ -13,42 +13,47 @@ public class CustomerCLI {
         System.out.println("CUSTOMER VIEW");
         while (true) {
             printCustomerMenu();
-            int choice = Integer.parseInt(consoleInput.nextLine());
+            try {
+                int choice = Integer.parseInt(consoleInput.nextLine());
                 switch (choice) {
-            case 1:
-                System.out.println(customer.viewProducts());
-                break;
-            case 2:
-                System.out.print("Enter product ID: ");
-                customer.basket.addShopping(Integer.parseInt(consoleInput.nextLine()));
-                break;
-            case 3:
-                System.out.println(customer.showBasket());
-                System.out.println();
-                break;
-            case 4:
-                customer.pay(consoleInput);
-                System.out.println();
-                break;
-            case 5:
-                customer.basket.emptyBasket();
-                System.out.println();
-                break;
-            case 6:
-                System.out.print("Search (either the Product ID or the compatibility NOT BOTH): ");
-                String term = consoleInput.nextLine();
-                try{
-                    int inputInt = Integer.parseInt(term);
-                    System.out.println(customer.search(inputInt));
+                    case 1:
+                        System.out.println(customer.viewProducts());
+                        break;
+                    case 2:
+                        System.out.print("Enter product ID: ");
+                        customer.basket.addShopping(Integer.parseInt(consoleInput.nextLine()));
+                        break;
+                    case 3:
+                        System.out.println(customer.showBasket());
+                        System.out.println();
+                        break;
+                    case 4:
+                        customer.pay(consoleInput);
+                        System.out.println();
+                        break;
+                    case 5:
+                        customer.basket.emptyBasket();
+                        System.out.println();
+                        break;
+                    case 6:
+                        System.out.print("Search (either the Product ID or the compatibility NOT BOTH): ");
+                        String term = consoleInput.nextLine();
+                        try{
+                            int inputInt = Integer.parseInt(term);
+                            System.out.println(customer.search(inputInt));
 
-                } catch (NumberFormatException e) {
-                    System.out.println(customer.search(term));
+                        } catch (NumberFormatException e) {
+                            System.out.println(customer.search(term));
+                        }
+                        System.out.println();
+                        break;
+                    case 0:
+                        return;
+                    default:
+                        System.out.println("Please enter a number between 1-6 for an option or 0 to log out\n");
                 }
-                System.out.println();
-                break;
-            case 0:
-                return;
-
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid entry type\n");
             }
         }
 
@@ -66,6 +71,5 @@ public class CustomerCLI {
         System.out.println("0) Log out");
 
     }
-
 
 }
