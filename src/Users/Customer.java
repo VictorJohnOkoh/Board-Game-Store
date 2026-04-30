@@ -8,10 +8,6 @@ import Payment.CreditCard;
 import Payment.PayPal;
 import Payment.Receipt;
 
-/*
- * stop customer from buying more products than in stock
- * stop customer from buying products out of stock
- */
 
 public class Customer extends User{
     public final Basket basket = new Basket();
