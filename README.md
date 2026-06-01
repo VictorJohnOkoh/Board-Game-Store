@@ -1,6 +1,6 @@
 CS Coursework for Object Oreinted Programming
 -
-Gives a Command Line Interface that allows the user to log in as an admin or customer <br/>
+Gives a Command Line Interface for a Board Game Store that allows the user to log in as an admin or customer <br/>
 
 Admins can:
 * Add a board or video game
