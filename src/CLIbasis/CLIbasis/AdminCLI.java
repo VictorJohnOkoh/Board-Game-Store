@@ -1,5 +1,6 @@
 package CLIbasis.CLIbasis;
 
+import Inventory.JavaPythonBridge;
 import Users.Admin;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class AdminCLI {
 
                 switch (selection) {
                     case 1:
-                        System.out.println(admin.viewProducts());
+                        JavaPythonBridge.run("getAdminProducts", admin.getUserID());
                         System.out.println();
                         break;
 

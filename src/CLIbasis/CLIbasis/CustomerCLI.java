@@ -1,8 +1,7 @@
 package CLIbasis.CLIbasis;
 
-
 import Users.Customer;
-
+import Inventory.JavaPythonBridge;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -17,7 +16,7 @@ public class CustomerCLI {
                 int choice = Integer.parseInt(consoleInput.nextLine());
                 switch (choice) {
                     case 1:
-                        System.out.println(customer.viewProducts());
+                        JavaPythonBridge.run("getProducts");
                         break;
                     case 2:
                         System.out.print("Enter product ID: ");
