@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="sqlite-jdbc">
+    <CLASSES />
+    <JAVADOC />
+    <NATIVE>
+      <root url="jar://$USER_HOME$/Downloads/sqlite-jdbc-3.53.2.0-javadoc.jar!/" />
+    </NATIVE>
+    <SOURCES />
+  </library>
+</component>
