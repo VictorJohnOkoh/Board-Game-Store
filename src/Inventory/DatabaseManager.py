@@ -3,7 +3,7 @@ import sqlite3
 
 # TODO - Add function that works with load products to replace use of text file
 #
-DB_Path = r'C:\Users\Victor\Documents\Projects\IntelliJ\src\Inventory\StoreData'
+DB_Path = r'StoreData'
 
 # stops redundant connections in each function
 conn = sqlite3.connect(DB_Path)
@@ -12,8 +12,8 @@ cursor = conn.cursor()
 def getUserRole(ID: int):
     """Returns the user's role"""
 
-    query = f"SELECT role FROM main.UserRole WHERE userid = {ID}"
-    cursor.execute(query)
+    query = "SELECT role FROM main.UserRole WHERE userid = ?"
+    cursor.execute(query, (ID,))
     rows = cursor.fetchall()
     role = rows[0]
 
@@ -42,8 +42,8 @@ def getUserAddress(ID: int):
     3 - city
     """
 
-    query = f"SELECT userid, housenum, postcode, city FROM UserDetails WHERE userid = {ID}"
-    cursor.execute(query)
+    query = "SELECT userid, housenum, postcode, city FROM UserDetails WHERE userid = ?"
+    cursor.execute(query, (ID,))
     rows = cursor.fetchall()
     address = [rows[0][0], rows[0][1], rows[0][2], rows[0][3]]
 
@@ -56,7 +56,7 @@ def getAdminProducts(ID: int):
         return "You don't have the necessary permissions"
 
 
-    query =  f"SELECT BoardGame.id, 'boardgame', genre, name, price, quantity, pcost, noplayers FROM main.BoardGame LEFT JOIN main.BoardGamePlayers ON BoardGame.id = BoardGamePlayers.id UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, pcost, compatibility FROM main.Accessory LEFT JOIN main.AccessoryCompatibility AC on Accessory.id = AC.id ORDER BY price DESC"
+    query =  "SELECT BoardGame.id, 'boardgame', genre, name, price, quantity, pcost, noplayers FROM main.BoardGame LEFT JOIN main.BoardGamePlayers ON BoardGame.id = BoardGamePlayers.id UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, pcost, compatibility FROM main.Accessory LEFT JOIN main.AccessoryCompatibility AC on Accessory.id = AC.id ORDER BY price DESC"
     cursor.execute(query)
     rows = cursor.fetchall()
     result = ""
@@ -66,7 +66,6 @@ def getAdminProducts(ID: int):
         else:
             line = f"ProductID: {row[0]}\t | Category: {row[1]}\t | Type: {row[2]:<13s}\t | Name: {row[3]:<27s}\t | Price: {row[4]:.2f}\t | Quantity: {row[5]}\t | Cost: {row[6]:.2f}\t | Compatibility: {row[7]}\t\n"
         result += line
-
 
     return result
 
@@ -122,13 +121,12 @@ def filterProductID(search: int):
 
 def updateStock(amount: int, ID: int, category: str):
     """Updates the stock of a product after its purchase"""
-    conn = sqlite3.connect(DB_Path)
-    cursor = conn.cursor()
+
     if category == 'boardgame':
-        query = f"UPDATE BoardGame SET main.BoardGame.quantity=(quantity-?) WHERE main.BoardGame.id=?"
+        query = "UPDATE BoardGame SET main.BoardGame.quantity=(quantity-?) WHERE main.BoardGame.id=?"
         cursor.execute(query, (amount, ID))
     else:
-        query = f"UPDATE BoardGame SET main.Accessory.quantity=(quantity-?) WHERE main.Accessory.id=?"
+        query = "UPDATE BoardGame SET main.Accessory.quantity=(quantity-?) WHERE main.Accessory.id=?"
         cursor.execute(query, (amount, ID))
 
     return "Success"
@@ -136,8 +134,7 @@ def updateStock(amount: int, ID: int, category: str):
 
 def addBoardGame(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, num_players: int):
     """Adds a new board game to the BoardGame and BoardGamePlayers tables"""
-    conn = sqlite3.connect(DB_Path)
-    cursor = conn.cursor()
+
     query1 = 'INSERT INTO main.BoardGame (id, genre, name, price, quantity, pcost) VALUES (?, ?, ?, ?, ?, ?);'
     query2 = 'INSERT INTO main.BoardGamePlayers(id, noplayers) VALUES (?, ?);'
     cursor.execute(query1, (productID, genretype, name, price, stock, purchase_cost))
