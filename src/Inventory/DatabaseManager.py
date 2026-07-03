@@ -3,7 +3,7 @@ import sqlite3
 
 # TODO - Add function that works with load products to replace use of text file
 #
-DB_Path = r'StoreData'
+DB_Path = 'src/Inventory/StoreData'
 
 # stops redundant connections in each function
 conn = sqlite3.connect(DB_Path)
