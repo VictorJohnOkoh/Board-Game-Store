@@ -154,6 +154,20 @@ def addAccessory(productID: int, name: str, genretype: str, price: float, stock:
 
     return "Success"
 
+def loadUsers():
+    """Returns all users in the same semicolon-delimited format as UserAccount.txt"""
+
+    query = "SELECT UserDetails.userid, name, role FROM main.UserDetails LEFT JOIN main.UserRole ON UserDetails.userid = UserRole.userid"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    result = ""
+    i = 0
+    for row in rows:
+        line = f"{i}) {row[0]} | {row[1]} | {row[2]} | {row[3]}\n"
+        result += line
+        
+    return result
+
 # Closes the connection to the database at the end of the program
 def close_connection():
     global conn, cursor

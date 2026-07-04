@@ -75,7 +75,7 @@ public class Stock {
         loadedProducts = listProducts();
     }
 
-    // Shows all products currently stocked
+    // Shows all products currently stocked (excluding the purchase cost)
     public String showStockCustomer(){
         StringBuilder contents = new StringBuilder();
         for (Product product : loadedProducts) {
@@ -93,6 +93,8 @@ public class Stock {
         return contents.toString();
     }
 
+
+    // shows all details for every product in stock (including purchase cost)
     public String showStockAdmin(){
         StringBuilder contents = new StringBuilder();
         for (Product product : loadedProducts) {
@@ -111,6 +113,7 @@ public class Stock {
         return contents.toString();
     }
 
+    // takes the amount in the basket for the product and subtracts that amount from the quantity in the Stock File
     public void updateStock(Basket basket) throws IOException {
         ArrayList<Product> basketContents = basket.getBasket();
         ArrayList<Integer> amount = basket.getAmounts();
@@ -124,7 +127,7 @@ public class Stock {
                 }
             }
         }
-        // writes the updates stock to the Stock file
+        // writes the updated stock to the Stock file
         try(PrintWriter out = new PrintWriter(stockFile)){
             StringBuilder output = new StringBuilder();
             for (int i = 0; i < loadedProducts.size(); i++){
@@ -142,6 +145,7 @@ public class Stock {
 
     }
 
+    // adds a new product to the Stock file
     public void addStock(Product product) throws IOException {
         try(
             PrintWriter stock_file = new PrintWriter(new FileWriter(stockFile, true))){
@@ -185,6 +189,8 @@ public class Stock {
 	}
 
     public static boolean checkStock(Basket basket){
+        // checks if the products being paid for are still in stock
+        // if there isn't enough of one of the products in stock then an error is shown on the screen
         ArrayList<Integer> amountList = basket.getAmounts();
         StringBuilder outOfStock = new StringBuilder("There aren't enough of these products in stock for your purchase:\n");
         boolean enoughStock = true;

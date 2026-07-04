@@ -15,25 +15,31 @@ public class CustomerCLI {
             try {
                 int choice = Integer.parseInt(consoleInput.nextLine());
                 switch (choice) {
+                    // displays all products
                     case 1:
                         JavaPythonBridge.run("getProducts");
                         break;
+                    // add product to the basket using the product ID
                     case 2:
                         System.out.print("Enter product ID: ");
                         customer.basket.addShopping(Integer.parseInt(consoleInput.nextLine()));
                         break;
+                    // shows all contents of the customer's basket
                     case 3:
                         System.out.println(customer.showBasket());
                         System.out.println();
                         break;
+                    // pays for products in the basket
                     case 4:
                         customer.pay(consoleInput);
                         System.out.println();
                         break;
+                    // empties the basket
                     case 5:
                         customer.basket.emptyBasket();
                         System.out.println();
                         break;
+                    // searches for products using product ID
                     case 6:
                         System.out.print("Search (either the Product ID or the compatibility NOT BOTH): ");
                         String term = consoleInput.nextLine();

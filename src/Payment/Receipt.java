@@ -12,6 +12,7 @@ public class Receipt {
     private final Address address;
     private int cardNumber;
 
+    // constructor for paying via PayPal
     public Receipt(double paying, Address addr, String mail){
         amount = paying;
         address = addr;
@@ -19,6 +20,7 @@ public class Receipt {
 
     }
 
+    // constructor for paying via Credit/Debit card
     public Receipt(double paying, Address addr, int card){
         amount = paying;
         address = addr;

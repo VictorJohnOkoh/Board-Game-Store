@@ -22,6 +22,7 @@ public class Admin extends User{
         double purchase_cost;
         int num_players;
 
+        // loops while the length of the new ID isn't 4 characters
         boolean pass = false;
         while (!pass) {
             System.out.print("Enter the board game's ID: ");
@@ -61,6 +62,7 @@ public class Admin extends User{
         double purchase_cost;
         String compatibility;
 
+        // loops while the new ID isn't 4 characters long
         boolean pass = false;
         while (!pass) {
             System.out.print("Enter the accessory's ID: ");

@@ -12,8 +12,6 @@ public class AdminCLI {
     public static void run(Scanner consoleInput, Admin admin) throws IOException {
     	System.out.println("ADMIN VIEW");
 
-
-        
         while (true) {
         	printAdminMenu();
 
@@ -21,11 +19,13 @@ public class AdminCLI {
                 int selection = Integer.parseInt(consoleInput.nextLine().trim());
 
                 switch (selection) {
+                    // displays all products
                     case 1:
                         JavaPythonBridge.run("getAdminProducts", admin.getUserID());
                         System.out.println();
                         break;
 
+                    // add new product
                     case 2:
                         System.out.println();
                         System.out.println("1) Add a board game");

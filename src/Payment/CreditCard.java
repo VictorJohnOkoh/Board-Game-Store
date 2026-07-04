@@ -9,7 +9,7 @@ public class CreditCard implements PaymentMethod{
     public CreditCard(Scanner consoleInput) {
         boolean pass = false;
 
-
+        // loops as long as the card number doesn't pass verification
         while (!pass) {
             System.out.print("Enter your 6 digit card number: ");
             cardNumber = consoleInput.nextInt();
@@ -20,6 +20,7 @@ public class CreditCard implements PaymentMethod{
                 pass = true;
             }
         }
+        // loops while the security number doesn't pass verification
         pass = false;
         while (!pass) {
             int securityNumber;
