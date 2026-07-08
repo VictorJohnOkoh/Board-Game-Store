@@ -57,7 +57,7 @@ public class Admin extends User{
     public void addAccessory(Scanner consoleInput) {
         int product_id = 0;
         String name;
-        String type = "";
+        AccessoryType type = null;
         double price;
         int stock;
         double purchase_cost;
@@ -80,11 +80,11 @@ public class Admin extends User{
         System.out.println("What is the accessory's type: \n1) accessory kit 2) miniature 3) dice");
         int choice = Integer.parseInt(consoleInput.nextLine());
         if (choice == 1){
-            type = Accessory.ACCESSORY_KIT;
+            type = AccessoryType.accessory_kit;
         } else if (choice == 2){
-            type = Accessory.MINIATURE;
+            type = AccessoryType.miniature;
         } else if (choice == 3){
-            type = Accessory.DICE;
+            type = AccessoryType.dice;
         } else {
             System.out.println("Invalid choice");
         }

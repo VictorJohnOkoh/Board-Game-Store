@@ -1,9 +1,18 @@
 import os
 import sqlite3
+import shutil
 
 # TODO - Add function that works with load products to replace use of text file
 #
 DB_Path = r'src\Inventory\StoreData.db'
+
+def rollback():
+    # copies the backup to the path of the original database
+    shutil.copy2('backups\\StoreData_backup.db', 'StoreData.db')
+
+def create_backup():
+    # creates a backup of the database in the backups dir
+    shutil.copy2('StoreData.db', 'backups\\StoreData_backup.db')
 
 # stops redundant connections in each function
 try:
@@ -14,6 +23,9 @@ try:
     cursor = conn.cursor()
 except sqlite3.OperationalError:
     print("Couldn't open the database")
+except FileNotFoundError:
+    rollback()
+
 
 def getUserRole(ID: int):
     """Returns the user's role"""
@@ -127,6 +139,7 @@ def filterProductID(search: int):
 def updateStock(amount: int, ID: int, category: str):
     """Updates the stock of a product after its purchase"""
 
+    create_backup()
     if category == 'boardgame':
         query = "UPDATE BoardGame SET main.BoardGame.quantity=(quantity-?) WHERE main.BoardGame.id=?"
         cursor.execute(query, (amount, ID))
@@ -139,6 +152,8 @@ def updateStock(amount: int, ID: int, category: str):
 
 def addBoardGame(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, players: int):
     """Adds a new board game to the BoardGame and BoardGamePlayers tables"""
+
+    create_backup()
     try:
         query1 = 'INSERT INTO main.BoardGame (id, genre, name, price, quantity, pcost) VALUES (?, ?, ?, ?, ?, ?);'
         query2 = 'INSERT INTO main.BoardGamePlayers(id, noplayers) VALUES (?, ?);'
@@ -153,6 +168,8 @@ def addBoardGame(productID: int, name: str, genretype: str, price: float, stock:
 
 def addAccessory(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, compatibility: str):
     """Adds a new accessory to the Accessory and AccessoryCompatibility  tables"""
+
+    create_backup()
     try:
         query1 = 'INSERT INTO main.Accessory (id, type, name, price, quantity, pcost) VALUES (?, ?, ?, ?, ?, ?);'
         query2 = 'INSERT INTO main.AccessoryCompatibility (id, compatibility) VALUES (?, ?);'
