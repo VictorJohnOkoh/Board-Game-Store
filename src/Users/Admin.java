@@ -13,7 +13,7 @@ public class Admin extends User{
     }
 
     // adds a boardgame to the stock file
-    public void addBoardGame(Scanner consoleInput) throws IOException {
+    public void addBoardGame(Scanner consoleInput) {
         int product_id = 0;
         String name;
         String type;
@@ -47,13 +47,14 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = Integer.parseInt(consoleInput.nextLine());
 
-        Product product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
-        User.stockClass.addStock(product);
+      BoardGame product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
+//      User.stockClass.addStock(product);
+      JavaPythonBridge.run("addBoardGame", product);
 
     }
 
     // adds an accessory to the stock file
-    public void addAccessory(Scanner consoleInput) throws IOException {
+    public void addAccessory(Scanner consoleInput) {
         int product_id = 0;
         String name;
         String type = "";
@@ -96,9 +97,9 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = Integer.parseInt(consoleInput.nextLine());
 
-        Product product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
-        User.stockClass.addStock(product);
-
+        Accessory product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
+//        User.stockClass.addStock(product);
+        JavaPythonBridge.run("addAccessory", product);
     }
 
 

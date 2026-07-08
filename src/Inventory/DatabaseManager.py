@@ -1,18 +1,24 @@
+import os
 import sqlite3
-
 
 # TODO - Add function that works with load products to replace use of text file
 #
-DB_Path = 'src/Inventory/StoreData'
+DB_Path = r'src\Inventory\StoreData.db'
 
 # stops redundant connections in each function
-conn = sqlite3.connect(DB_Path)
-cursor = conn.cursor()
+try:
+    print(f"Your CWD is: {os.getcwd()}")
+    print(f"Python is looking for the file at: {os.path.abspath('StoreData.db')}")
+    print(f"Does the file actually exist there? {os.path.exists('StoreData.db')}")
+    conn = sqlite3.connect(DB_Path)
+    cursor = conn.cursor()
+except sqlite3.OperationalError:
+    print("Couldn't open the database")
 
 def getUserRole(ID: int):
     """Returns the user's role"""
 
-    query = "SELECT role FROM main.UserRole WHERE userid = ?"
+    query = "SELECT role FROM UserRole WHERE userid = ?"
     cursor.execute(query, (ID,))
     rows = cursor.fetchall()
     role = rows[0]
@@ -84,7 +90,6 @@ def getProducts():
             line = f"ProductID: {row[0]}\t | Category: {row[1]}\t | Type: {row[2]:<13s}\t | Name: {row[3]:<27s}\t | Price: {row[4]:.2f}\t | Quantity: {row[5]}\t | Compatibility: {row[7]}\t\n"
         result += line
 
-
     return result
 
 
@@ -132,27 +137,32 @@ def updateStock(amount: int, ID: int, category: str):
     return "Success"
 
 
-def addBoardGame(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, num_players: int):
+def addBoardGame(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, players: int):
     """Adds a new board game to the BoardGame and BoardGamePlayers tables"""
+    try:
+        query1 = 'INSERT INTO main.BoardGame (id, genre, name, price, quantity, pcost) VALUES (?, ?, ?, ?, ?, ?);'
+        query2 = 'INSERT INTO main.BoardGamePlayers(id, noplayers) VALUES (?, ?);'
+        cursor.execute(query1, (productID, genretype, name, price, stock, purchase_cost))
+        cursor.execute(query2, (productID, players))
+        conn.commit()
 
-    query1 = 'INSERT INTO main.BoardGame (id, genre, name, price, quantity, pcost) VALUES (?, ?, ?, ?, ?, ?);'
-    query2 = 'INSERT INTO main.BoardGamePlayers(id, noplayers) VALUES (?, ?);'
-    cursor.execute(query1, (productID, genretype, name, price, stock, purchase_cost))
-    cursor.execute(query2, (productID, num_players))
-    conn.commit()
-
-    return "Success"
+        return "Success"
+    except sqlite3.IntegrityError:
+        return "Product with that ID already exists"
 
 
 def addAccessory(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, compatibility: str):
+    """Adds a new accessory to the Accessory and AccessoryCompatibility  tables"""
+    try:
+        query1 = 'INSERT INTO main.Accessory (id, type, name, price, quantity, pcost) VALUES (?, ?, ?, ?, ?, ?);'
+        query2 = 'INSERT INTO main.AccessoryCompatibility (id, compatibility) VALUES (?, ?);'
+        cursor.execute(query1, (productID, genretype, name, price, stock, purchase_cost))
+        cursor.execute(query2, (productID, compatibility))
+        conn.commit()
 
-    query1 = 'INSERT INTO main.Accessory (id, type, name, price, quantity, pcost) VALUES (?, ?, ?, ?, ?, ?);'
-    query2 = 'INSERT INTO main.AccessoryCompatibility (id, compatibility) VALUES (?, ?);'
-    cursor.execute(query1, (productID, genretype, name, price, stock, purchase_cost))
-    cursor.execute(query2, (productID, compatibility))
-    conn.commit()
-
-    return "Success"
+        return "Success"
+    except sqlite3.IntegrityError:
+        return "Product with that ID already exists"
 
 def loadUsers():
     """Returns all users in the same semicolon-delimited format as UserAccount.txt"""
@@ -177,4 +187,57 @@ def close_connection():
         conn.close()
     return "Database connection closed cleanly"
 
+def checkDB():
+    tables = ['BoardGame', 'BoardGamePlayers', 'Accessory', 'AccessoryCompatibility', 'UserDetails', 'UserRole']
+    for table in tables:
+        try: # checks if all tables in the database
+            query = 'SELECT * From ?'
+            cursor.execute(query, (table,))
+        except sqlite3.OperationalError:
+            print("Database Corrupted: some table(s) don't exist")
 
+# Structure to run functions by passing JSON data
+#
+# def main():
+#
+#     # checks if a function argument was passed
+#     if len(sys.argv) < 2:
+#         print("Error no function targeted")
+#         sys.exit(1)
+#
+#     target_function = sys.argv[1]
+#     input_data = sys.stdin.read()
+#     if not input_data:
+#         print("Error: no JSON received via stdin")
+#         return
+#     data = json.loads(input_data)
+#
+#     # runs the function associated to the argument passed and takes in arguments piped from Java
+#     if target_function == "getUserRole":
+#         getUserRole(int(data[0]))
+#     elif target_function == "getUserDetails":
+#         getUserDetails()
+#     elif target_function == "getUserAddress":
+#         getUserAddress(int(data[0]))
+#     elif target_function == "getAdminProducts":
+#         getAdminProducts(int(data[0]))
+#     elif target_function == "getProducts":
+#         getProducts()
+#     elif target_function == "filterProductCompatibility":
+#         filterProductCompatibility(data[0])
+#     elif target_function == "updateStock":
+#         updateStock(int(data['id']), int(data['stock']), data['category'])
+#     elif target_function == "addBoardGame":
+#         addBoardGame(int(data['id']), data['name'], data['type'], float(data['price']), int(data['stock']), float(data['cost']), int(data['players']))
+#     elif target_function == "addAccessory":
+#         addAccessory(int(data['id']), data['name'], data['type'], float(data['price']), int(data['stock']), float(data['cost']), data['compatibility'])
+#     elif target_function == "loadUsers":
+#         loadUsers()
+#     elif target_function == " close_connection":
+#         close_connection()
+#     else:
+#         print(f"Error: unknown function name {target_function}")
+#         sys.exit(1)
+#
+# if __name__ == "__main__":
+#     main()
