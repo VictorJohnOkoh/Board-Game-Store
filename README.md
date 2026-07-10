@@ -10,4 +10,4 @@ Customers can:
 * View all items in stock (excluding their purchase price)
 * Filter items based on compatibility or product ID
 * Add a product to their basket
-* CHeckout with their basket
+* Checkout with their basket
