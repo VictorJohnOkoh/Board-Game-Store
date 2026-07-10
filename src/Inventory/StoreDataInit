@@ -1,0 +1,95 @@
+create table Accessory
+(
+    id       INTEGER
+        primary key,
+    type     VARCHAR(8)  not null,
+    name     VARCHAR(50) not null,
+    price    REAL        not null,
+    quantity INTEGER     not null,
+    pcost    REAL        not null,
+    check (type IN ('accessory kit', 'miniature', 'dice'))
+);
+
+create table AccessoryCompatibility
+(
+    id            INTEGER
+        primary key
+        references Accessory
+            on delete cascade,
+    compatibility VARCHAR(30) not null
+);
+
+create table BoardGame
+(
+    id       INTEGER
+        primary key,
+    genre    VARCHAR(8)  not null,
+    name     VARCHAR(50) not null,
+    price    REAL        not null,
+    quantity INTEGER     not null,
+    pcost    REAL        not null,
+    check (genre IN ('strategy', 'party'))
+);
+
+create table BoardGamePlayers
+(
+    id
+        primary key
+        references BoardGame
+            on delete cascade,
+    noplayers INTEGER not null
+);
+
+create table UserDetails
+(
+    userid   INTEGER
+        primary key,
+    name     VARCHAR(10) not null,
+    housenum INTEGER     not null,
+    postcode VARCHAR(8)  not null,
+    city     VARCHAR(30) not null,
+    check (housenum < 1000 AND housenum > 0)
+);
+
+create table UserRole
+(
+    userid INTEGER
+        primary key
+        references UserDetails,
+    role   VARCHAR(8) not null,
+    check (role IN ('admin', 'customer'))
+);
+
+INSERT INTO BoardGame(id, genre, name, price, quantity, pcost) VALUES (1908,'party', 'Quick Draw Chaos', 25, 35, 12);
+INSERT INTO BoardGame(id, genre, name, price, quantity, pcost) VALUES (1908,'strategy', 'Kingdoms of Valor', 45, 20, 25);
+INSERT INTO BoardGame(id, genre, name, price, quantity, pcost) VALUES (1908,'strategy', 'Galactic Dominion', 55, 15, 30);
+INSERT INTO BoardGame(id, genre, name, price, quantity, pcost) VALUES (1908,'party', 'Mystery Mansion', 32, 22, 18);
+
+INSERT INTO BoardGamePlayers(id, noplayers) VALUES (5201,4);
+INSERT INTO BoardGamePlayers(id, noplayers) VALUES (1908,8);
+INSERT INTO BoardGamePlayers(id, noplayers) VALUES (6723,5);
+INSERT INTO BoardGamePlayers(id, noplayers) VALUES (8251,6);
+
+INSERT INTO Accessory(id, type, name, price, quantity, pcost) VALUES (2039, 'miniature', 'Space Commander Figure', 18, 25, 7);
+INSERT INTO Accessory(id, type, name, price, quantity, pcost) VALUES (2674, 'dice', 'Metal D20 Collector Die', 9, 60, 3.5);
+INSERT INTO Accessory(id, type, name, price, quantity, pcost) VALUES (4935, 'accessory kit', 'Tactical Grid Playmat', 22, 30, 10);
+INSERT INTO Accessory(id, type, name, price, quantity, pcost) VALUES (7125, 'miniature', 'Ancient Warrior Model', 15, 28, 6);
+INSERT INTO Accessory(id, type, name, price, quantity, pcost) VALUES (7381, 'dice', '7-piece Polyhedral Dice Set', 12, 50, 5);
+INSERT INTO Accessory(id, type, name, price, quantity, pcost) VALUES (7412, 'accessory kit', 'Mystic Realm Playmat', 20, 40, 8);
+
+INSERT INTO AccessoryCompatibility(id, compatibility) VALUES (2039, 'Warhammer 40K');
+INSERT INTO AccessoryCompatibility(id, compatibility) VALUES (2674, 'Universal');
+INSERT INTO AccessoryCompatibility(id, compatibility) VALUES (4935, 'Universal');
+INSERT INTO AccessoryCompatibility(id, compatibility) VALUES (7125, 'Ancient Battles');
+INSERT INTO AccessoryCompatibility(id, compatibility) VALUES (7381, 'Dungeons & Dragons');
+INSERT INTO AccessoryCompatibility(id, compatibility) VALUES (7412, 'Universal');
+
+INSERT INTO UserDetails(userid, name, housenum, postcode, city) VALUES (101, 'Alex', 12, 'LE11 3TU', 'Loughborough');
+INSERT INTO UserDetails(userid, name, housenum, postcode, city) VALUES (102, 'Sam', 14, 'NG1 4BU', 'Nottingham');
+INSERT INTO UserDetails(userid, name, housenum, postcode, city) VALUES (103, 'Ren', 100, 'CV1 2GT', 'Coventry');
+INSERT INTO UserDetails(userid, name, housenum, postcode, city) VALUES (104, 'Noor', 57, 'B1 1AA', 'Birmingham');
+
+INSERT INTO UserRole(userid, role) VALUES (101, 'admin');
+INSERT INTO UserRole(userid, role) VALUES (101, 'customer');
+INSERT INTO UserRole(userid, role) VALUES (101, 'customer');
+INSERT INTO UserRole(userid, role) VALUES (101, 'customer');

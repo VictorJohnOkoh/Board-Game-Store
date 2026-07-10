@@ -10,6 +10,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: Deprecate entire class
+// TODO: replace load products with database-based function
+// TODO: replace check stock function
+
+
 public class Stock {
     private static final File stockFile = new File("Stock.txt");
     private static ArrayList<Product> loadedProducts = new ArrayList<>();
@@ -30,10 +35,11 @@ public class Stock {
             if (list.get(1).trim().equals("board game")) {
                 BoardGame newGame = new BoardGame(list.toArray(new String[0]));
                 productList.add(newGame);
-            } else {
-                Accessory newAccessory = new Accessory(list.toArray(new String[0]));
-                productList.add(newAccessory);
             }
+//            else {
+//                Accessory newAccessory = new Accessory(list.toArray(new String[0]));
+//                productList.add(newAccessory);
+//            }
         }
         return productList;
     }

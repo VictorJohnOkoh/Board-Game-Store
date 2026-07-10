@@ -21,7 +21,7 @@ public class AdminCLI {
                 switch (selection) {
                     // displays all products
                     case 1:
-                        JavaPythonBridge.run("getAdminProducts", admin.getUserID());
+                        JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS, admin.getUserID());
                         System.out.println();
                         break;
 

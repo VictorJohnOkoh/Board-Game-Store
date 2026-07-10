@@ -27,7 +27,7 @@ except FileNotFoundError:
     rollback()
 
 
-def getUserRole(ID: int):
+def get_user_role(ID: int):
     """Returns the user's role"""
 
     query = "SELECT role FROM UserRole WHERE userid = ?"
@@ -38,7 +38,7 @@ def getUserRole(ID: int):
     return role
 
 
-def getUserDetails():
+def get_user_details():
     """Prints the details of all users of the system"""
 
     query = "SELECT UserDetails.userid, name, housenum, postcode, city, role FROM main.UserDetails LEFT JOIN main.UserRole ON UserDetails.userid = UserRole.userid"
@@ -52,7 +52,7 @@ def getUserDetails():
     return result
 
 
-def getUserAddress(ID: int):
+def get_user_address(ID: int):
     """Returns the userid, house number, postcode and city of a user in an array
     0 - userid
     1 - house number
@@ -67,9 +67,9 @@ def getUserAddress(ID: int):
 
     return address
 
-def getAdminProducts(ID: int):
+def get_admin_products(ID: int):
     """Returns all information about all board games and accessories stored in the store database"""
-    if getUserRole(ID) == 'admin':
+    if get_user_role(ID) == 'admin':
         print()
         return "You don't have the necessary permissions"
 
@@ -88,7 +88,7 @@ def getAdminProducts(ID: int):
     return result
 
 
-def getProducts():
+def get_products():
     """Returns information viewable by customers about all board games and accessories stored in the store database"""
 
     query = "SELECT BoardGame.id, 'boardgame', genre, name, price, quantity, pcost, noplayers FROM main.BoardGame LEFT JOIN main.BoardGamePlayers ON BoardGame.id = BoardGamePlayers.id UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, pcost, compatibility FROM Accessory LEFT JOIN AccessoryCompatibility AC on Accessory.id = AC.id ORDER BY price DESC"
@@ -105,7 +105,7 @@ def getProducts():
     return result
 
 
-def filterProductCompatibility(search: str):
+def filter_product_compatibility(search: str):
     """Filters the products by their compatibility"""
 
     query = "SELECT Accessory.id, 'accessory',type, name, price, quantity, pcost, compatibility FROM main.Accessory LEFT JOIN AccessoryCompatibility ON Accessory.id = AccessoryCompatibility.id WHERE compatibility LIKE ?;"
@@ -119,7 +119,7 @@ def filterProductCompatibility(search: str):
     return result
 
 
-def filterProductID(search: int):
+def filter_product_id(search: int):
     """Filters the products by their ID"""
 
     query = "SELECT Boardgame.id, 'boardgame', genre, name, price, quantity, pcost, noplayers FROM main.BoardGame LEFT JOIN main.BoardGamePlayers BGP on BoardGame.id = BGP.id WHERE BoardGame.id LIKE ? UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, pcost, compatibility FROM main.Accessory LEFT JOIN main.AccessoryCompatibility AC on Accessory.id = AC.id WHERE Accessory.id LIKE ?;"
@@ -136,21 +136,43 @@ def filterProductID(search: int):
     return result
 
 
-def updateStock(amount: int, ID: int, category: str):
+def update_stock(amount: int, ID: int, category: str):
     """Updates the stock of a product after its purchase"""
 
-    create_backup()
-    if category == 'boardgame':
-        query = "UPDATE BoardGame SET main.BoardGame.quantity=(quantity-?) WHERE main.BoardGame.id=?"
-        cursor.execute(query, (amount, ID))
+    if check_stock(amount, ID):
+        create_backup()
+        if category == 'boardgame':
+            query = "UPDATE BoardGame SET main.BoardGame.quantity=(quantity-?) WHERE main.BoardGame.id=?"
+            cursor.execute(query, (amount, ID))
+        else:
+            query = "UPDATE BoardGame SET main.Accessory.quantity=(quantity-?) WHERE main.Accessory.id=?"
+            cursor.execute(query, (amount, ID))
+
+        return "Success"
+    # returns the name of the out of stock
     else:
-        query = "UPDATE BoardGame SET main.Accessory.quantity=(quantity-?) WHERE main.Accessory.id=?"
-        cursor.execute(query, (amount, ID))
+        query = "SELECT name From BoardGame WHERE id = ? UNION SELECT name From Accessory WHERE id = ?"
+        cursor.execute(query, (ID, ID))
+        item_name = cursor.fetchone()
+        return f"Not enough of the {item_name} is in stock"
 
-    return "Success"
+def check_stock(amount: int, ID: int):
+    """checks if there is enough of the product to be bought in stock returns true if there's enough stock otherwise it returns false"""
+
+    query = "SELECT BoardGame.quantity From BoardGame WHERE id=? UNION SELECT Accessory.quantity FROM Accessory WHERE id=?"
+    cursor.execute(query, (ID, ID))
+    current_amount = cursor.fetchone()
+    if current_amount is None:
+        return False
+    elif current_amount == 0:
+        return False
+    elif current_amount - amount < 0:
+        return False
+    else:
+        return True
 
 
-def addBoardGame(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, players: int):
+def add_board_game(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, players: int):
     """Adds a new board game to the BoardGame and BoardGamePlayers tables"""
 
     create_backup()
@@ -166,7 +188,7 @@ def addBoardGame(productID: int, name: str, genretype: str, price: float, stock:
         return "Product with that ID already exists"
 
 
-def addAccessory(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, compatibility: str):
+def add_accessory(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, compatibility: str):
     """Adds a new accessory to the Accessory and AccessoryCompatibility  tables"""
 
     create_backup()
@@ -181,7 +203,7 @@ def addAccessory(productID: int, name: str, genretype: str, price: float, stock:
     except sqlite3.IntegrityError:
         return "Product with that ID already exists"
 
-def loadUsers():
+def load_users():
     """Returns all users in the same semicolon-delimited format as UserAccount.txt"""
 
     query = "SELECT UserDetails.userid, name, role FROM main.UserDetails LEFT JOIN main.UserRole ON UserDetails.userid = UserRole.userid"
@@ -204,7 +226,7 @@ def close_connection():
         conn.close()
     return "Database connection closed cleanly"
 
-def checkDB():
+def check_db():
     tables = ['BoardGame', 'BoardGamePlayers', 'Accessory', 'AccessoryCompatibility', 'UserDetails', 'UserRole']
     for table in tables:
         try: # checks if all tables in the database

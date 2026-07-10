@@ -17,7 +17,7 @@ public class CustomerCLI {
                 switch (choice) {
                     // displays all products
                     case 1:
-                        JavaPythonBridge.run("getProducts");
+                        JavaPythonBridge.run(JavaPythonBridge.GET_PRODUCTS);
                         break;
                     // add product to the basket using the product ID
                     case 2:

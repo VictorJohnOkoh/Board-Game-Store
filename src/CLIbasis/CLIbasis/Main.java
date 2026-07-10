@@ -45,7 +45,7 @@ public class Main {
 
 			
 			if (selection == 0) {
-				JavaPythonBridge.run("close_connection");
+				JavaPythonBridge.run(JavaPythonBridge.CLOSE_CONNECTION);
 				System.out.println("Goodbye");
 				System.out.println("Closing program...");
 				System.out.println();

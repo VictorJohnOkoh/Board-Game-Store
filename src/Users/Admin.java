@@ -2,7 +2,6 @@ package Users;
 
 import Inventory.*;
 
-import java.io.*;
 import java.util.Scanner;
 
 
@@ -49,7 +48,7 @@ public class Admin extends User{
 
       BoardGame product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
 //      User.stockClass.addStock(product);
-      JavaPythonBridge.run("addBoardGame", product);
+      JavaPythonBridge.run(JavaPythonBridge.ADD_BOARD_GAME, product);
 
     }
 
@@ -99,12 +98,12 @@ public class Admin extends User{
 
         Accessory product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
 //        User.stockClass.addStock(product);
-        JavaPythonBridge.run("addAccessory", product);
+        JavaPythonBridge.run(JavaPythonBridge.ADD_ACCESSORY, product);
     }
 
 
     public String viewProducts() {
-        return User.stockClass.showStockAdmin();
+        return JavaPythonBridge.run_result(JavaPythonBridge.GET_ADMIN_PRODUCTS);
     }
 
     public String toString(){
