@@ -1,15 +1,12 @@
 package CLIbasis.CLIbasis;
 
-import Inventory.JavaPythonBridge;
 import Users.Admin;
-
-import java.io.IOException;
 import java.util.Scanner;
 
 public class AdminCLI {
 	public final static String INVALID = "Invalid input";
 
-    public static void run(Scanner consoleInput, Admin admin) throws IOException {
+    public static void run(Scanner consoleInput, Admin admin) {
     	System.out.println("ADMIN VIEW");
 
         while (true) {
@@ -21,7 +18,7 @@ public class AdminCLI {
                 switch (selection) {
                     // displays all products
                     case 1:
-                        JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS, admin.getUserID());
+                        admin.viewProducts();
                         System.out.println();
                         break;
 

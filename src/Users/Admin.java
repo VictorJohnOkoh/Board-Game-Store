@@ -102,8 +102,8 @@ public class Admin extends User{
     }
 
 
-    public String viewProducts() {
-        return JavaPythonBridge.run_result(JavaPythonBridge.GET_ADMIN_PRODUCTS);
+    public void viewProducts() {
+         System.out.println(JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS, getUserID()));
     }
 
     public String toString(){

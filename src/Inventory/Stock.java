@@ -10,9 +10,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: Deprecate entire class
-// TODO: replace load products with database-based function
-// TODO: replace check stock function
 
 
 public class Stock {
@@ -27,7 +24,7 @@ public class Stock {
         }
     }
 
-
+// Deprecated
     // Returns an arrayList of Products after being passed a 2D array from a line in the stock file
     private static ArrayList<Product> loadProducts(ArrayList<List<String>> splitContents) {
         ArrayList<Product> productList = new ArrayList<>();
@@ -44,6 +41,7 @@ public class Stock {
         return productList;
     }
 
+//    deprecated
     // Returns a list of products sorted into descending order by price
     private static ArrayList<Product> descOrder(ArrayList<Product> list){
         Product temp;
@@ -65,7 +63,7 @@ public class Stock {
         }
         return list;
     }
-
+//deprecated
     // returns an ArrayList of Products in the Stock.txt file ordered by price
     private static ArrayList<Product> listProducts() throws IOException {
         List<String> lines = Files.readAllLines(stockFile.toPath());
@@ -80,7 +78,7 @@ public class Stock {
     private void updateLoadedProducts() throws IOException {
         loadedProducts = listProducts();
     }
-
+//deprecated
     // Shows all products currently stocked (excluding the purchase cost)
     public String showStockCustomer(){
         StringBuilder contents = new StringBuilder();
@@ -99,7 +97,7 @@ public class Stock {
         return contents.toString();
     }
 
-
+//deprecated
     // shows all details for every product in stock (including purchase cost)
     public String showStockAdmin(){
         StringBuilder contents = new StringBuilder();
@@ -119,38 +117,8 @@ public class Stock {
         return contents.toString();
     }
 
-    // takes the amount in the basket for the product and subtracts that amount from the quantity in the Stock File
-    public void updateStock(Basket basket) throws IOException {
-        ArrayList<Product> basketContents = basket.getBasket();
-        ArrayList<Integer> amount = basket.getAmounts();
-        for (int i = 0; i<basketContents.size(); i++){
-            Product basketContent = basketContents.get(i);
-            for (Product product : loadedProducts) {
-                if (basketContent.getProductID() == product.getProductID()) {
-                    int oldStock = product.getQuantityInStock();
-                    int boughtStock = amount.get(i);
-                    product.setQuantityInStock(oldStock - boughtStock);
-                }
-            }
-        }
-        // writes the updated stock to the Stock file
-        try(PrintWriter out = new PrintWriter(stockFile)){
-            StringBuilder output = new StringBuilder();
-            for (int i = 0; i < loadedProducts.size(); i++){
-                output.append(loadedProducts.get(i).toString());
-                if (i < loadedProducts.size()-1){
-                    output.append("\n");
-                }
-            }
-            out.print(output);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
-        updateLoadedProducts();
-
-    }
-
+//deprecated
     // adds a new product to the Stock file
     public void addStock(Product product) throws IOException {
         try(
@@ -172,6 +140,7 @@ public class Stock {
         return loadedProducts;
     }
 
+//    deprecated
     // checks if the product being added has a matching name or ID, and returns true if there are any conflicts
     public static boolean checkConflicts(Product checkedProduct){
         boolean conflict = false;
@@ -188,12 +157,12 @@ public class Stock {
         }
         return conflict;
     }
-
+//deprecated
     // either checks if a single product passed is still in stock or there's enough stock for the products in a basket, returns false if it isn't in stock
     public static boolean checkStock(Product product){
 		return product.getQuantityInStock() != 0;
 	}
-
+//deprecated
     public static boolean checkStock(Basket basket){
         // checks if the products being paid for are still in stock
         // if there isn't enough of one of the products in stock then an error is shown on the screen

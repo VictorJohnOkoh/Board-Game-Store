@@ -6,8 +6,8 @@ import Users.Address;
 
 public class Receipt {
     LocalDate localdate = LocalDate.now();
-    private final double amount;
     private final String date  = localdate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    private final double amount;
     private String email;
     private final Address address;
     private int cardNumber;

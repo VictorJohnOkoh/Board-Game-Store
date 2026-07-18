@@ -1,13 +1,12 @@
 package CLIbasis.CLIbasis;
 
 import Users.Customer;
-import Inventory.JavaPythonBridge;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class CustomerCLI {
 
-    public static void run(Scanner consoleInput, Customer customer) throws IOException {
+    public static void run(Scanner consoleInput, Customer customer) {
 
         System.out.println("CUSTOMER VIEW");
         while (true) {
@@ -17,22 +16,28 @@ public class CustomerCLI {
                 switch (choice) {
                     // displays all products
                     case 1:
-                        JavaPythonBridge.run(JavaPythonBridge.GET_PRODUCTS);
+                        customer.viewProducts();
                         break;
                     // add product to the basket using the product ID
                     case 2:
-                        System.out.print("Enter product ID: ");
-                        customer.basket.addShopping(Integer.parseInt(consoleInput.nextLine()));
+                        System.out.println("Enter product ID: ");
+                        int ID = consoleInput.nextInt();
+                        customer.basket.addShopping(ID);
                         break;
                     // shows all contents of the customer's basket
                     case 3:
-                        System.out.println(customer.showBasket());
+                        customer.showBasket();
                         System.out.println();
                         break;
                     // pays for products in the basket
                     case 4:
-                        customer.pay(consoleInput);
-                        System.out.println();
+                        // check if the basket is empty before allowing payment
+                        if (!customer.basket.isEmpty()) {
+                            customer.pay(consoleInput);
+                            System.out.println();
+                        } else {
+                            System.out.println("The basket is empty unable to pay");
+                        }
                         break;
                     // empties the basket
                     case 5:

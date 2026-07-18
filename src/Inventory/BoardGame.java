@@ -25,9 +25,4 @@ public class BoardGame extends Product{
         return String.format("%d; %s; %s; %s; %.2f; %d; %.2f; %d", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), getPurchaseCost(), num_players);
     }
 
-    public String partString()
-    {
-        return String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Stock: %d|Number of Players: %d |", getProductID(), "board game", type, getProductName(), getPrice(), getQuantityInStock(), num_players);
-
-    }
 }

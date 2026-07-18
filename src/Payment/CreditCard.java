@@ -13,6 +13,7 @@ public class CreditCard implements PaymentMethod{
         while (!pass) {
             System.out.print("Enter your 6 digit card number: ");
             cardNumber = consoleInput.nextInt();
+            consoleInput.nextLine();
             String test = String.format("%d", cardNumber).replaceAll("\\s+", "");
             if (test.length() != 6) {
                 System.out.println("Incorrect length.");
@@ -26,6 +27,7 @@ public class CreditCard implements PaymentMethod{
             int securityNumber;
             System.out.print("Enter your 3 digit security number: ");
             securityNumber = consoleInput.nextInt();
+            consoleInput.nextLine();
             String test = String.format("%d", securityNumber).replaceAll("\\s+", "");
             if (test.length() != 3) {
                 System.out.println("Incorrect length");

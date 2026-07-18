@@ -1,6 +1,5 @@
 package Users;
-import Inventory.Product;
-import Inventory.Stock;
+import Inventory.*;
 
 import java.util.ArrayList;
 
@@ -36,40 +35,66 @@ public class Basket {
         System.out.println("Basket empty");
     }
 
-    // adds a product to the basket, if it is already in it then it instead increments the amount in the amount ArrayList
-    public void addShopping(int productID){
-        boolean found = false;
-        int index = 0;
-        for (int i = 0; i< basket.size(); i++){
-            if (basket.get(i).getProductID() == productID){
-                found = true;
-                index = i;
-                if (basket.get(i).getQuantityInStock() == 0){
-                    System.out.println("This product is currently out of stock");
-                    return;
-                }
+    public void addToBasket(Product product, int amount) {
+        ArrayList<Product> basketItems = getBasket();
+        ArrayList<Integer> amounts = getAmounts();
+
+        // Check if item is already in the basket
+        for (int i = 0; i < basketItems.size(); i++) {
+            if (basketItems.get(i).getProductID() == product.getProductID()) {
+                amounts.set(i, amounts.get(i) + amount);
+                return;
             }
         }
-        if (found){
-            int temp = amount.get(index);
-            temp++;
-            amount.set(index, temp);
 
+        // Add new item
+        basketItems.add(product);
+        amounts.add(amount);
+    }
+
+    // adds a product to the basket, if it is already in it then it instead increments the amount in the amount ArrayList
+    public void addShopping(Product product, int amount) {
+        String result = JavaPythonBridge.run_result(JavaPythonBridge.GET_PRODUCT_BY_ID, product.getProductID());
+
+        if (result == null || "NOT_FOUND".equals(result)) {
+            System.out.println("Product not found in database.");
+            return;
+        }
+
+        String[] parts = result.split(";");
+        // Expected format: id;category;type;name;price;quantity;purchase_cost;extra
+
+        int id = Integer.parseInt(parts[0].trim());
+        String category = parts[1].trim();
+        String type = parts[2].trim();
+        String name = parts[3].trim();
+        double price = Double.parseDouble(parts[4].trim());
+        int quantity = Integer.parseInt(parts[5].trim());
+        double purchaseCost = Double.parseDouble(parts[6].trim());
+
+        if ("boardgame".equalsIgnoreCase(category)) {
+            int numPlayers = Integer.parseInt(parts[7].trim());
+            // Note: Adjust constructor arguments to match your actual BoardGame class signature
+            BoardGame game = new BoardGame(id, type, name, price, purchaseCost, quantity,  numPlayers);
+            addToBasket(game, amount);
+        } else if ("accessory".equalsIgnoreCase(category)) {
+            String compatibility = parts[7].trim();
+            AccessoryType accType = parseAccessoryType(type);
+            Accessory acc = new Accessory(id, accType, name, price, purchaseCost, quantity, compatibility);
+            addToBasket(acc, amount);
         } else {
-            ArrayList<Product> orderedLines = Stock.getLoadedProducts();
-            for (Product product : orderedLines) {
-                if (product.getProductID() == productID){
-					if (Stock.checkStock(product)) {
-						basket.add(product);
-						amount.add(1);
-					} else {
-                        System.out.println("This product is currently out of stock.\n");
-                    }
-				}
-            }
-
+            System.out.println("Unknown product category: " + category);
         }
     }
+
+    private AccessoryType parseAccessoryType(String typeStr) {
+        switch (typeStr.toLowerCase()) {
+            case "accessory kit": return AccessoryType.accessory_kit;
+            case "miniature": return AccessoryType.miniature;
+            default: return AccessoryType.dice;
+        }
+    }
+
 
     // gets total price of products in the basket
     public double getTotalPrice(){

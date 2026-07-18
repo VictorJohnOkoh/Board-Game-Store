@@ -2,8 +2,7 @@ import os
 import sqlite3
 import shutil
 
-# TODO - Add function that works with load products to replace use of text file
-#
+
 DB_Path = r'src\Inventory\StoreData.db'
 
 def rollback():
@@ -33,21 +32,25 @@ def get_user_role(ID: int):
     query = "SELECT role FROM UserRole WHERE userid = ?"
     cursor.execute(query, (ID,))
     rows = cursor.fetchall()
-    role = rows[0]
+    role = rows[0][0]
 
     return role
 
 
 def get_user_details():
-    """Prints the details of all users of the system"""
+    """Returns the details of all users of the system
+    In the format: userid | name | house number | postcode | city | role
+    """
 
     query = "SELECT UserDetails.userid, name, housenum, postcode, city, role FROM main.UserDetails LEFT JOIN main.UserRole ON UserDetails.userid = UserRole.userid"
     cursor.execute(query)
     rows = cursor.fetchall()
     result = ""
     for row in rows:
-        line = f"UserID: {row[0]}\t | Name: {row[1]}\t | House Number: {row[2]:<3}\t | Postcode: {row[3]:<8}\t | City: {row[4]:<15}\t | Role: {row[5]}\t\n"
+        line = f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]};{row[5]}"
         result += line
+        if rows.index(row) < len(rows)-1:
+            result += ','
 
     return result
 
@@ -69,8 +72,7 @@ def get_user_address(ID: int):
 
 def get_admin_products(ID: int):
     """Returns all information about all board games and accessories stored in the store database"""
-    if get_user_role(ID) == 'admin':
-        print()
+    if get_user_role(ID) != 'admin':
         return "You don't have the necessary permissions"
 
 
@@ -136,25 +138,48 @@ def filter_product_id(search: int):
     return result
 
 
-def update_stock(amount: int, ID: int, category: str):
-    """Updates the stock of a product after its purchase"""
-
-    if check_stock(amount, ID):
-        create_backup()
-        if category == 'boardgame':
-            query = "UPDATE BoardGame SET main.BoardGame.quantity=(quantity-?) WHERE main.BoardGame.id=?"
-            cursor.execute(query, (amount, ID))
-        else:
-            query = "UPDATE BoardGame SET main.Accessory.quantity=(quantity-?) WHERE main.Accessory.id=?"
-            cursor.execute(query, (amount, ID))
-
+def update_stock(basket_data: str):
+    """Updates stock for multiple products from a basket string.
+    To be used after a basket has been paid for
+    Input format: 'id1:amount1;id2:amount2;...'
+    Returns: 'Success' or error message if any item has insufficient stock
+    """
+    if not basket_data:
         return "Success"
-    # returns the name of the out of stock
-    else:
-        query = "SELECT name From BoardGame WHERE id = ? UNION SELECT name From Accessory WHERE id = ?"
-        cursor.execute(query, (ID, ID))
-        item_name = cursor.fetchone()
-        return f"Not enough of the {item_name} is in stock"
+
+    items = basket_data.split(';')
+    create_backup()
+
+    for item in items:
+        if ':' not in item:
+            continue
+        parts = item.split(':')
+        try:
+            pid = int(parts[0])
+            amount = int(parts[1])
+        except ValueError:
+            continue
+
+        query_check = "SELECT quantity FROM main.BoardGame WHERE id=? UNION SELECT quantity FROM main.Accessory WHERE id=?"
+        cursor.execute(query_check, (pid, pid))
+        result = cursor.fetchone()
+
+        if result is None or result[0] < amount:
+            query_name = "SELECT name FROM main.BoardGame WHERE id=? UNION SELECT name FROM main.Accessory WHERE id=?"
+            cursor.execute(query_name, (pid, pid))
+            item_name = cursor.fetchone()
+            conn.rollback()
+            return f"Not enough of the {item_name[0]} is in stock"
+
+        query_boardgame = "UPDATE BoardGame SET quantity=quantity-? WHERE id=? AND quantity>=?"
+        cursor.execute(query_boardgame, (amount, pid, amount))
+
+        if cursor.rowcount == 0:
+            query_accessory = "UPDATE Accessory SET quantity=quantity-? WHERE id=? AND quantity>=?"
+            cursor.execute(query_accessory, (amount, pid, amount))
+
+    conn.commit()
+    return "Success"
 
 def check_stock(amount: int, ID: int):
     """checks if there is enough of the product to be bought in stock returns true if there's enough stock otherwise it returns false"""
@@ -162,9 +187,7 @@ def check_stock(amount: int, ID: int):
     query = "SELECT BoardGame.quantity From BoardGame WHERE id=? UNION SELECT Accessory.quantity FROM Accessory WHERE id=?"
     cursor.execute(query, (ID, ID))
     current_amount = cursor.fetchone()
-    if current_amount is None:
-        return False
-    elif current_amount == 0:
+    if current_amount[0] == 0:
         return False
     elif current_amount - amount < 0:
         return False
@@ -216,6 +239,81 @@ def load_users():
         result += line
         
     return result
+
+def get_product_by_id(ID: int) -> str:
+    """Returns a semicolon-delimited row for a product by ID, or 'NOT_FOUND'."""
+    query = "SELECT BoardGame.id, 'boardgame', genre, name, price, quantity, pcost, noplayers FROM BoardGame LEFT JOIN BoardGamePlayers ON BoardGame.id = BoardGamePlayers.id WHERE BoardGame.id=? UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, pcost, compatibility FROM Accessory LEFT JOIN AccessoryCompatibility ON Accessory.id = AccessoryCompatibility.id WHERE Accessory.id=?"
+    cursor.execute(query, (ID, ID))
+    row = cursor.fetchone()
+    if row:
+        return f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]};{row[5]};{row[6]};{row[7]}"
+    return "NOT_FOUND"
+
+
+def check_basket_stock(basket_data: str) -> str:
+    """Checks stock for multiple items. Input: 'id1:amount1;id2:amount2;...' Output: 'OK' or ';'-delimited out-of-stock names."""
+    if not basket_data:
+        return "OK"
+
+    items = basket_data.split(';')
+    out_of_stock_names = []
+
+    for item in items:
+        if ':' not in item:
+            continue
+        parts = item.split(':')
+        try:
+            pid = int(parts[0])
+            amount = int(parts[1])
+        except ValueError:
+            continue
+
+        # Check stock
+        query = "SELECT quantity FROM main.BoardGame WHERE id=? UNION SELECT quantity FROM main.Accessory WHERE id=?"
+        cursor.execute(query, (pid, pid))
+        result = cursor.fetchone()
+
+        if result and result[0] >= amount:
+            continue  # Enough stock
+
+        # Not enough stock, get name
+        query_name = "SELECT name FROM main.BoardGame WHERE id=? UNION SELECT name FROM main.Accessory WHERE id=?"
+        cursor.execute(query_name, (pid, pid))
+        name_result = cursor.fetchone()
+        if name_result:
+            out_of_stock_names.append(name_result[0])
+
+    if not out_of_stock_names:
+        return "OK"
+    return ';'.join(out_of_stock_names)
+
+
+def check_product_conflict(name: str, ID: int) -> str:
+    """Checks for duplicate name or ID. Returns 'NONE', 'NAME', 'ID', or 'BOTH'."""
+    has_name_conflict = False
+    has_id_conflict = False
+
+    # Check ID
+    query_id = "SELECT id FROM main.BoardGame WHERE id=? UNION SELECT id FROM main.Accessory WHERE id=?"
+    cursor.execute(query_id, (ID, ID))
+    if cursor.fetchone():
+        has_id_conflict = True
+
+    # Check Name (case-insensitive)
+    query_name = "SELECT name FROM main.BoardGame WHERE LOWER(name)=LOWER(?) UNION SELECT name FROM main.Accessory WHERE LOWER(name)=Lower(?)"
+    cursor.execute(query_name, (name, name))
+    if cursor.fetchone():
+        has_name_conflict = True
+
+    if has_id_conflict and has_name_conflict:
+        return "BOTH"
+    elif has_id_conflict:
+        return "ID"
+    elif has_name_conflict:
+        return "NAME"
+    else:
+        return "NONE"
+
 
 # Closes the connection to the database at the end of the program
 def close_connection():

@@ -5,21 +5,15 @@ import Users.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-	private final static ArrayList<User> userList;
-
-	static {
-		try {
-			userList = User.loadUsers();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	private final static List<User> userList = loadUsers();
 
 
-	public static void main(String[] args) throws IOException {
+
+	static void main(String[] args) throws IOException {
 
         Scanner consoleInput = new Scanner(System.in);
 
@@ -82,6 +76,22 @@ public class Main {
 
         System.out.println("0) Exit");
     }
+
+	/** Loads the User accounts in the database into a list of User objects that can be accessed*/
+	@SuppressWarnings({"ConstantValue", "DataFlowIssue"})
+    private static List<User> loadUsers(){
+		List<User> userList = new ArrayList<>(List.of());
+		String unparsedData = JavaPythonBridge.run_result(JavaPythonBridge.GET_USER_DETAILS);
+		if (unparsedData.isEmpty() || unparsedData == null){
+			System.out.println("Failed to load users");
+			throw new NullPointerException();
+		}
+        List<String> userDataList = List.of(unparsedData.split(","));
+		for (String userData : userDataList){
+			userList.add(User.buildUser(userData));
+		}
+		return userList;
+	}
 
     private static String readLine(Scanner consoleInput) {
         if (!consoleInput.hasNextLine()) {

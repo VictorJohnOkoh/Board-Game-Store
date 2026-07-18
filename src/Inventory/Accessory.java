@@ -19,13 +19,7 @@ public class Accessory extends Product{
 
     public String getCompatibility(){return compatibility;}
     public String getType(){
-        if (type == AccessoryType.accessory_kit) {
-            return "accessory kit";
-        } else if (type == AccessoryType.miniature) {
-            return String.valueOf(type);
-        } else {
-            return String.valueOf(type);
-        }
+        return type.toString();
     }
 
     @Override
@@ -33,8 +27,4 @@ public class Accessory extends Product{
         return String.format("%d; %s; %s; %s; %.2f; %d; %.2f; %s", getProductID(), "accessory", getType(), getProductName(), getPrice(), getQuantityInStock(), getPurchaseCost(), compatibility);
     }
 
-    public String partString(){
-        return String.format("|Product ID: %d |Category: %s |Type: %-13s |Name: %-27s |Price: %.2f |Stock: %d |Compatibility: %s |", getProductID(), "accessory", type, getProductName(), getPrice(), getQuantityInStock(), compatibility);
-
-    }
 }
