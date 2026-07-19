@@ -22,15 +22,15 @@ public class newBasket {
 
     /**
      * Adds {@code amount} units of {@code product} to the basket.
-     *
+     * <p>
      * If the product is not already in the basket, it is added with its
      * amount set to {@code amount} (as long as stock allows it).
      * If the product is already in the basket, {@code amount} is added to
      * its current basket quantity.
-     *
-     * If the resulting total quantity for that product would exceed the
+     * <p>
+     * If the resulting total quantity for that product exceeds the
      * product's {@code quantityInStock}, the whole operation is cancelled
-     * (the basket is left unchanged) and a message is printed to the CLI.
+     * (the basket is left unchanged), and a message is printed to the CLI.
      *
      * @param pid the ID for the product to add
      * @param amount  how many units to add
@@ -140,7 +140,7 @@ public class newBasket {
         System.out.printf("Total: £%.2f%n", getTotalPrice());
     }
 
-    /** Returns the product ID and the amount in the format 'id1:amount;id2:amount;...'
+    /** Returns the product ID and the amount in the format 'id1:amount;id2:amount; ...'
      * to be passed to update the amount of the product in stock
      * */
     public String getProductAmount(){
