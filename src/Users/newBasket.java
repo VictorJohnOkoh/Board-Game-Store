@@ -8,7 +8,6 @@ import Inventory.Product;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//TODO: fix the increasing amount of the product in the basket, currently a new entry is made instead of incrementing the amount
 
 /**
  * Represents a shopping basket that can hold both {@link BoardGame} and
