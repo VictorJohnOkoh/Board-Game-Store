@@ -22,6 +22,7 @@ public class CustomerCLI {
                     case 2:
                         System.out.println("Enter product ID: ");
                         int ID = consoleInput.nextInt();
+                        consoleInput.nextLine();
                         customer.basket.addShopping(ID);
                         break;
                     // shows all contents of the customer's basket
