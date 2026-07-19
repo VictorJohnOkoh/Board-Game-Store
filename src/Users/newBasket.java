@@ -8,6 +8,8 @@ import Inventory.Product;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+//TODO: fix the increasing amount of the product in the basket, currently a new entry is made instead of incrementing the amount
+
 /**
  * Represents a shopping basket that can hold both {@link BoardGame} and
  * {@link Accessory} products (or any other {@link Product} subtype).
@@ -41,11 +43,9 @@ public class newBasket {
         if (!productData.equals("NOT_FOUND")){
             product = Product.buildProduct(productData);
         } else {
-            System.out.println("The product wasn't found, try entering the correct Product ID again");
             return;
         }
         if (amount <= 0) {
-            System.out.println("Amount to add must be greater than zero.");
             return;
         }
 
@@ -53,9 +53,6 @@ public class newBasket {
         int newTotal = currentAmount + amount;
 
         if (newTotal > product.getQuantityInStock()) {
-            System.out.println("Transaction cancelled: not enough stock for \""
-                    + product.getProductName() + "\". Requested: " + newTotal
-                    + ", In stock: " + product.getQuantityInStock());
             return;
         }
 
