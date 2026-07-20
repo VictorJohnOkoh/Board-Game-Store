@@ -17,10 +17,26 @@ public class JavaPythonBridge {
     public static final String UPDATE_STOCK      = "update_stock";
     public static final String FILTER_ID = "filter_product_id";
     public static final String FILTER_COMPATIBILITY = "filter_product_compatibility";
+    public static final String ROLLBACK = "rollback";
 
     // relative path to the DBMS python script
     private static final String SCRIPT_PATH = "src\\Inventory\\DatabaseManager.py";
 
+    // absolute path to the database file
+    private static String DB_PATH;
+    static {
+        try {
+            java.io.File scriptFile = new java.io.File(SCRIPT_PATH);
+            String dbDir = scriptFile.getParent();
+            if (dbDir != null) {
+                DB_PATH = new java.io.File(dbDir, "StoreData.db").getAbsolutePath();
+            } else {
+                DB_PATH = System.getProperty("user.dir") + "\\src\\Inventory\\StoreData.db";
+            }
+        } catch (Exception e) {
+            DB_PATH = System.getProperty("user.dir") + "\\src\\Inventory\\StoreData.db";
+        }
+    }
 
     // global sharedInterpreter
     private final static SharedInterpreter interp = new SharedInterpreter();
@@ -28,9 +44,10 @@ public class JavaPythonBridge {
 
     // Static initializer
     static {
-        try{
+        try {
+            interp.set("db_path", DB_PATH);
             interp.runScript(SCRIPT_PATH);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Error closing SharedInterpreter: " + e.getMessage());
         }
     }
@@ -110,7 +127,7 @@ A run method typically will not return anything while a run_result method return
         }
     }
 
-//    for adding an accessory object
+    /** Passes the information for an accessory to be added to the database*/
     public static void run(String functionName, Accessory accessory) {
 
         try  {

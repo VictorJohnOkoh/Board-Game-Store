@@ -42,6 +42,20 @@ public abstract class Product {
     }
     public abstract String toString();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product product)) return false;
+        // Replace `productID` with whatever unique field identifies your products
+        return this.productID == product.productID;
+    }
+
+    @Override
+    public int hashCode() {
+        // Must use the exact same field used in equals()
+        return Integer.hashCode(productID);
+    }
+
     /** Takes in a string containing the
      * product ID, genre/type, name, price, quantity, purchase cost, and compatibility/no players
      * (depending on whether it's a @BoardGame or @Accessory being made)

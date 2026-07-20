@@ -3,22 +3,33 @@ import sqlite3
 import shutil
 
 
-DB_Path = r'src\Inventory\StoreData.db'
+_DB_PATH = None
+_BACKUP_DIR = None
+_BACKUP_PATH = None
+
+def init_paths():
+    global _DB_PATH, _BACKUP_DIR, _BACKUP_PATH
+    if 'db_path' in globals() and db_path:
+        _DB_PATH = db_path
+    else:
+        _DB_PATH = os.path.join(os.getcwd(), 'src', 'Inventory', 'StoreData.db')
+    script_dir = os.path.dirname(_DB_PATH)
+    _BACKUP_DIR = os.path.join(script_dir, 'backups')
+    _BACKUP_PATH = os.path.join(_BACKUP_DIR, 'StoreData_backup.db')
 
 def rollback():
-    # copies the backup to the path of the original database
-    shutil.copy2('backups\\StoreData_backup.db', 'StoreData.db')
+    shutil.copy2(_BACKUP_PATH, _DB_PATH)
 
 def create_backup():
-    # creates a backup of the database in the backups dir
-    shutil.copy2('StoreData.db', 'backups\\StoreData_backup.db')
+    if not os.path.exists(_BACKUP_DIR):
+        os.makedirs(_BACKUP_DIR)
+    shutil.copy2(_DB_PATH, _BACKUP_PATH)
+
+init_paths()
 
 # stops redundant connections in each function
 try:
-    print(f"Your CWD is: {os.getcwd()}")
-    print(f"Python is looking for the file at: {os.path.abspath('StoreData.db')}")
-    print(f"Does the file actually exist there? {os.path.exists('StoreData.db')}")
-    conn = sqlite3.connect(DB_Path)
+    conn = sqlite3.connect(_DB_PATH)
     cursor = conn.cursor()
 except sqlite3.OperationalError:
     print("Couldn't open the database")

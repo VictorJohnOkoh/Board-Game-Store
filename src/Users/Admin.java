@@ -2,6 +2,7 @@ package Users;
 
 import Inventory.*;
 
+import CLIbasis.CLIbasis.ValidationUtils;
 import java.util.Scanner;
 
 
@@ -34,9 +35,17 @@ public class Admin extends User{
             }
         }
         System.out.print("Enter the board game's name: ");
-        name = consoleInput.nextLine();
-        System.out.print("Enter the board game's type: ");
-        type = consoleInput.nextLine().toLowerCase();
+        name = ValidationUtils.getNonEmptyString(consoleInput, "");
+        while (true) {
+            System.out.print("Enter the board game's type: ");
+            String input = consoleInput.nextLine().trim();
+            if (!input.matches("[a-zA-Z]+")) {
+                System.out.println("Invalid input. Please enter only English letters.\n");
+                continue;
+            }
+            type = input.toLowerCase();
+            break;
+        }
         System.out.print("Enter the board game's price: ");
         price = Double.parseDouble(consoleInput.nextLine());
         System.out.print("Enter the board game's purchase cost: ");
@@ -75,17 +84,27 @@ public class Admin extends User{
             }
         }
         System.out.print("Enter the accessory's name: ");
-        name = consoleInput.nextLine();
-        System.out.println("What is the accessory's type: \n1) accessory kit 2) miniature 3) dice");
-        int choice = Integer.parseInt(consoleInput.nextLine());
-        if (choice == 1){
-            type = AccessoryType.accessory_kit;
-        } else if (choice == 2){
-            type = AccessoryType.miniature;
-        } else if (choice == 3){
-            type = AccessoryType.dice;
-        } else {
-            System.out.println("Invalid choice");
+        name = ValidationUtils.getNonEmptyString(consoleInput, "");
+        while (true) {
+            System.out.println("What is the accessory's type: \n1) accessory kit 2) miniature 3) dice");
+            String input = consoleInput.nextLine().trim();
+            if (!input.matches("[0-9]+")) {
+                System.out.println("Invalid input. Please enter a number (1, 2, or 3).\n");
+                continue;
+            }
+            int choice = Integer.parseInt(input);
+            if (choice == 1) {
+                type = AccessoryType.accessory_kit;
+                break;
+            } else if (choice == 2) {
+                type = AccessoryType.miniature;
+                break;
+            } else if (choice == 3) {
+                type = AccessoryType.dice;
+                break;
+            } else {
+                System.out.println("Invalid choice. Please enter 1, 2, or 3.\n");
+            }
         }
         System.out.print("Enter the accessory's price: ");
         price = Double.parseDouble(consoleInput.nextLine());

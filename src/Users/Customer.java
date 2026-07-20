@@ -49,7 +49,7 @@ public class Customer extends User{
         if (choice == 1){
             PayPal paypalInst = new PayPal(consoleInput);
             Receipt receipt = paypalInst.processPayment(basket.getTotalPrice(), getAddress());
-            System.out.println(receipt.paypalReceipt());
+            System.out.println(receipt.toString());
             updateStock();
             basket.emptyBasket();
 
@@ -57,7 +57,7 @@ public class Customer extends User{
         else if (choice == 2) {
             CreditCard creditInst = new CreditCard(consoleInput);
             Receipt receipt = creditInst.processPayment(basket.getTotalPrice(), getAddress());
-            System.out.println(receipt.cardReceipt());
+            System.out.println(receipt.toString());
             updateStock();
             basket.emptyBasket();
 

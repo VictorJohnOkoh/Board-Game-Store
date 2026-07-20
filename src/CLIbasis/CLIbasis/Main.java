@@ -27,12 +27,12 @@ public class Main {
 			int selection = 0;
 			// Checks if the user has entered anything before parsing their input
 			if (line == null){
-				System.out.println("Please enter a valid option");
+				System.out.println("Please enter a valid option\n");
 			} else {
 				try {
 					selection = Integer.parseInt(line.trim());
 				} catch (NumberFormatException e){
-					System.out.println("Please enter a valid option");
+					System.out.println("Please enter a valid option\n");
 					continue;
 				}
 			}
@@ -56,7 +56,7 @@ public class Main {
 						CustomerCLI.run(consoleInput, customer);
 					}
 				} else {
-					System.out.println("Invalid selection");
+					System.out.println("Invalid selection\n");
 				}
 			}
         }
