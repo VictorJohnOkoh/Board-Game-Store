@@ -12,7 +12,7 @@ def init_paths():
     if 'db_path' in globals() and db_path:
         _DB_PATH = db_path
     else:
-        _DB_PATH = os.path.join(os.getcwd(), 'src', 'Inventory', 'StoreData.db')
+        _DB_PATH = os.path.join(os.getcwd(), 'data', 'StoreData.db')
     script_dir = os.path.dirname(_DB_PATH)
     _BACKUP_DIR = os.path.join(script_dir, 'backups')
     _BACKUP_PATH = os.path.join(_BACKUP_DIR, 'StoreData_backup.db')

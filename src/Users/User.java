@@ -61,7 +61,7 @@ public abstract class User {
     public static List<User> loadUsers(){
         List<User> userList = new ArrayList<>(List.of());
         String unparsedData = JavaPythonBridge.run_result(JavaPythonBridge.GET_USER_DETAILS);
-        if (unparsedData.isEmpty() || unparsedData == null){
+        if (unparsedData == null || unparsedData.isEmpty()){
             System.out.println("Failed to load users");
             throw new NullPointerException();
         }

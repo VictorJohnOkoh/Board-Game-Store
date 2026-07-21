@@ -2,6 +2,8 @@ package Inventory;
 
 import jep.SharedInterpreter;
 
+import java.io.File;
+
 public class JavaPythonBridge {
 
     // Names of the Python functions in DatabaseManager.py. These are the ONE place
@@ -19,36 +21,59 @@ public class JavaPythonBridge {
     public static final String FILTER_COMPATIBILITY = "filter_product_compatibility";
     public static final String ROLLBACK = "rollback";
 
-    // relative path to the DBMS python script
-    private static final String SCRIPT_PATH = "src\\Inventory\\DatabaseManager.py";
-
-    // absolute path to the database file
-    private static String DB_PATH;
-    static {
-        try {
-            java.io.File scriptFile = new java.io.File(SCRIPT_PATH);
-            String dbDir = scriptFile.getParent();
-            if (dbDir != null) {
-                DB_PATH = new java.io.File(dbDir, "StoreData.db").getAbsolutePath();
-            } else {
-                DB_PATH = System.getProperty("user.dir") + "\\src\\Inventory\\StoreData.db";
-            }
-        } catch (Exception e) {
-            DB_PATH = System.getProperty("user.dir") + "\\src\\Inventory\\StoreData.db";
-        }
-    }
-
     // global sharedInterpreter
     private final static SharedInterpreter interp = new SharedInterpreter();
 
-
-    // Static initializer
     static {
+        // Calculate where the jep library is
+        File nativeLib = new File("lib\\jep\\jep.dll");
+        // Load the jep library
+        System.load(nativeLib.getAbsolutePath());
+
+
+        String scriptPathToUse;
+
+        // Always use the external data folder for the database
+        // absolute path to the database file
+        String DB_PATH = System.getProperty("user.dir") + "\\data\\StoreData.db";
+
+        // Try to find the Python script in the source directory
+        java.io.File scriptFile = new java.io.File("src\\Inventory\\DatabaseManager.py");
+        // temporary path for extracted Python script
+        String TEMP_SCRIPT_PATH;
+        if (scriptFile.exists()) {
+            TEMP_SCRIPT_PATH = null;
+            scriptPathToUse = "src\\Inventory\\DatabaseManager.py";
+        } else {
+            // Fallback: extract script from JAR resources to a temp file
+            try {
+                java.io.File tempScript = java.io.File.createTempFile("DatabaseManager", ".py");
+                java.io.InputStream scriptIn = JavaPythonBridge.class.getResourceAsStream("/Inventory/DatabaseManager.py");
+                if (scriptIn != null) {
+                    java.io.OutputStream scriptOut = new java.io.FileOutputStream(tempScript);
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+                    while ((bytesRead = scriptIn.read(buffer)) != -1) {
+                        scriptOut.write(buffer, 0, bytesRead);
+                    }
+                    scriptOut.close();
+                    scriptIn.close();
+                    TEMP_SCRIPT_PATH = tempScript.getAbsolutePath();
+                    scriptPathToUse = TEMP_SCRIPT_PATH;
+                } else {
+                    scriptPathToUse = "src\\Inventory\\DatabaseManager.py";
+                }
+            } catch (Exception e) {
+                System.err.println("Error extracting Python script: " + e.getMessage());
+                scriptPathToUse = "src\\Inventory\\DatabaseManager.py";
+            }
+        }
+
         try {
             interp.set("db_path", DB_PATH);
-            interp.runScript(SCRIPT_PATH);
+            interp.runScript(scriptPathToUse);
         } catch (Exception e) {
-            System.err.println("Error closing SharedInterpreter: " + e.getMessage());
+            System.err.println("Error initializing SharedInterpreter: " + e.getMessage());
         }
     }
 
