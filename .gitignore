@@ -6,6 +6,7 @@ out/
 .eml
 .iml
 __MACOSX
+.idea
 
 ### Eclipse ###
 .apt_generated
