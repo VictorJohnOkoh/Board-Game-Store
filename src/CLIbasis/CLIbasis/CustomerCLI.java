@@ -1,59 +1,74 @@
 package CLIbasis.CLIbasis;
 
-
 import Users.Customer;
-
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class CustomerCLI {
 
-    public static void run(Scanner consoleInput, Customer customer) throws IOException {
+    public static void run(Scanner consoleInput, Customer customer) {
 
         System.out.println("CUSTOMER VIEW");
         while (true) {
             printCustomerMenu();
+            int choice = ValidationUtils.getChoice(consoleInput, "Enter your choice: ", 0, 6);
+            
             try {
-                int choice = Integer.parseInt(consoleInput.nextLine());
                 switch (choice) {
+                    // displays all products
                     case 1:
-                        System.out.println(customer.viewProducts());
+                        customer.viewProducts();
+                        System.out.println();
                         break;
+                        
+                    // add product to the basket using the product ID
                     case 2:
-                        System.out.print("Enter product ID: ");
-                        customer.basket.addShopping(Integer.parseInt(consoleInput.nextLine()));
+                        int productId = ValidationUtils.getPositiveInt(consoleInput, "Enter product ID: ");
+                        customer.basket.addShopping(productId);
+                        System.out.println("Product added to basket successfully.\n");
                         break;
+                        
+                    // shows all contents of the customer's basket
                     case 3:
-                        System.out.println(customer.showBasket());
+                        customer.showBasket();
                         System.out.println();
                         break;
+                        
+                    // pays for products in the basket
                     case 4:
-                        customer.pay(consoleInput);
-                        System.out.println();
+                        if (ValidationUtils.checkBasketNotEmpty(customer.basket, "The basket is empty. Unable to pay.\n")) {
+                            customer.pay(consoleInput);
+                            System.out.println();
+                        }
                         break;
+                        
+                    // empties the basket
                     case 5:
                         customer.basket.emptyBasket();
-                        System.out.println();
+                        System.out.println("Basket has been cleared.\n");
                         break;
+                        
+                    // searches for products using product ID or compatibility
                     case 6:
-                        System.out.print("Search (either the Product ID or the compatibility NOT BOTH): ");
-                        String term = consoleInput.nextLine();
-                        try{
-                            int inputInt = Integer.parseInt(term);
-                            System.out.println(customer.search(inputInt));
-
-                        } catch (NumberFormatException e) {
-                            System.out.println(customer.search(term));
+                        String searchTerm = ValidationUtils.getNonEmptyString(consoleInput, "Search (either the Product ID or the compatibility NOT BOTH): ");
+                        
+                        if (ValidationUtils.isValidProductId(searchTerm)) {
+                            System.out.println(customer.search(Integer.parseInt(searchTerm)));
+                        } else if (ValidationUtils.isValidSearchTerm(searchTerm)) {
+                            System.out.println(customer.search(searchTerm));
+                        } else {
+                            System.out.println("Invalid search term. Please enter a valid product ID or compatibility.\n");
                         }
                         System.out.println();
                         break;
+                        
                     case 0:
                         return;
-                    default:
-                        System.out.println("Please enter a number between 1-6 for an option or 0 to log out\n");
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid entry type\n");
+            } catch (Exception e) {
+                ValidationUtils.handleCustomerOperationException(e, "customer operation");
+                System.out.println();
             }
         }
 

@@ -1,10 +1,7 @@
 package Users;
 
-import Inventory.Stock;
+import Inventory.JavaPythonBridge;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +10,6 @@ public abstract class User {
    private final String name;
    private final Address address;
    private final String role;
-   protected final static Stock stockClass = new Stock();
 
    public User(int id, String n, Address addr, String r){
        userID = id;
@@ -41,29 +37,40 @@ public abstract class User {
    // returns a string representation of the user's information
    public abstract String toString();
 
-   // allows user to see al products in the stock file
-   public abstract String viewProducts() throws IOException;
+   /**allows user to see all available products*/
+   public abstract void viewProducts();
 
-    // loads all users into an arraylist
-    public static ArrayList<User> loadUsers() throws IOException {
-        File userFile = new File("UserAccount.txt");
-        List<String> lines = Files.readAllLines(userFile.toPath());
-        ArrayList<List<String>> splitlines = new ArrayList<>();
-        for (String line : lines) {
-            splitlines.add(List.of(line.split(";")));
-        }
-        ArrayList<User> listedUsers = new ArrayList<>();
-        for (List<String> line : splitlines) {
-            Address address = new Address(Integer.parseInt(line.get(2).trim()), line.get(3).trim(), line.get(4).trim());
-            User newUser;
-            if (line.getLast().trim().equals("admin")) {
-                newUser = new Admin(Integer.parseInt(line.getFirst().trim()), line.get(1).trim(), address);
+    /** Takes in user data in the format userid;username;housenum;postcode;city;role*
+     * and returns a User
+     */
+   public static User buildUser(String userdata) {
+       List<String> parsedData = List.of(userdata.split(";"));
+       int userid = Integer.parseInt(parsedData.getFirst());
+       String username = parsedData.get(1);
+       Address address = new Address(Integer.parseInt(parsedData.get(2)), parsedData.get(3), parsedData.get(4));
+       String role = parsedData.get(5);
+       if (role.equals("admin")){
+           return new Admin(userid, username, address);
+       } else {
+           return new Customer(userid, username, address);
+       }
+   }
 
-            } else {
-                newUser = new Customer(Integer.parseInt(line.getFirst().trim()), line.get(1).trim(), address);
-            }
-            listedUsers.add(newUser);
+    /** Loads the User accounts in the database into a list of User objects that can be accessed*/
+    @SuppressWarnings({"ConstantValue", "DataFlowIssue"})
+    public static List<User> loadUsers(){
+        List<User> userList = new ArrayList<>(List.of());
+        String unparsedData = JavaPythonBridge.run_result(JavaPythonBridge.GET_USER_DETAILS);
+        if (unparsedData == null || unparsedData.isEmpty()){
+            System.out.println("Failed to load users");
+            throw new NullPointerException();
         }
-        return listedUsers;
+        List<String> userDataList = List.of(unparsedData.split(","));
+        for (String userData : userDataList){
+            userList.add(User.buildUser(userData));
+        }
+        return userList;
     }
+
+
 }

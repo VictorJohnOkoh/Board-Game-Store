@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component jdk="25" jdk_type="JavaSDK">
+	<contentEntry url="file://$MODULE_DIR$">
+		<excludeFolder url="file://$MODULE_DIR$/.venv"/>
+	</contentEntry>
+	<levels>
+		<level name="jep-4.3.1" value="project"/>
+		<level name="sqlite-jdbc-3.53.2.0-javadoc" value="project"/>
+		<level name="google.code.gson" value="project"/>
+	</levels>
+</component>

@@ -4,32 +4,32 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import Users.Address;
 
-public class Receipt {
+//TODO: write out the subclasses
+
+public abstract class Receipt {
     LocalDate localdate = LocalDate.now();
-    private final double amount;
     private final String date  = localdate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-    private String email;
+    private final double amount;
     private final Address address;
-    private int cardNumber;
 
-    public Receipt(double paying, Address addr, String mail){
-        amount = paying;
-        address = addr;
-        email = mail;
 
+    public Receipt(double amount, Address address){
+        this.amount = amount;
+        this.address = address;
     }
 
-    public Receipt(double paying, Address addr, int card){
-        amount = paying;
-        address = addr;
-        cardNumber = card;
+
+    protected double getAmount(){
+        return amount;
     }
 
-    public String cardReceipt(){
-        return String.format("£%.2f paid by Credit Card %d on %s. Billing Users.Address: %s\n", amount, cardNumber, date, address.toString());
+    protected Address getAddress(){
+        return address;
     }
 
-    public String paypalReceipt(){
-        return String.format("£%.2f paid via PayPal using %s on %s. Billing address: %s\n", amount, email, date, address.toString());
-       }
+    protected String getDate(){
+        return date;
+    }
+
+    public abstract String toString();
 }

@@ -6,6 +6,10 @@ out/
 .eml
 .iml
 __MACOSX
+.idea/
+# Keep specific .idea files tracked (remove from gitignore)
+!.idea/misc.xml
+!.idea/libraries/jep_4_3_1.xml
 
 ### Eclipse ###
 .apt_generated

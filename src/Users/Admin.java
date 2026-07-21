@@ -2,7 +2,7 @@ package Users;
 
 import Inventory.*;
 
-import java.io.*;
+import CLIbasis.CLIbasis.ValidationUtils;
 import java.util.Scanner;
 
 
@@ -13,7 +13,7 @@ public class Admin extends User{
     }
 
     // adds a boardgame to the stock file
-    public void addBoardGame(Scanner consoleInput) throws IOException {
+    public void addBoardGame(Scanner consoleInput) {
         int product_id = 0;
         String name;
         String type;
@@ -22,6 +22,7 @@ public class Admin extends User{
         double purchase_cost;
         int num_players;
 
+        // loops while the length of the new ID isn't 4 characters
         boolean pass = false;
         while (!pass) {
             System.out.print("Enter the board game's ID: ");
@@ -34,9 +35,17 @@ public class Admin extends User{
             }
         }
         System.out.print("Enter the board game's name: ");
-        name = consoleInput.nextLine();
-        System.out.print("Enter the board game's type: ");
-        type = consoleInput.nextLine().toLowerCase();
+        name = ValidationUtils.getNonEmptyString(consoleInput, "");
+        while (true) {
+            System.out.print("Enter the board game's type: ");
+            String input = consoleInput.nextLine().trim();
+            if (!input.matches("[a-zA-Z]+")) {
+                System.out.println("Invalid input. Please enter only English letters.\n");
+                continue;
+            }
+            type = input.toLowerCase();
+            break;
+        }
         System.out.print("Enter the board game's price: ");
         price = Double.parseDouble(consoleInput.nextLine());
         System.out.print("Enter the board game's purchase cost: ");
@@ -46,21 +55,23 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = Integer.parseInt(consoleInput.nextLine());
 
-        Product product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
-        User.stockClass.addStock(product);
+      BoardGame product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
+//      User.stockClass.addStock(product);
+      JavaPythonBridge.run(JavaPythonBridge.ADD_BOARD_GAME, product);
 
     }
 
     // adds an accessory to the stock file
-    public void addAccessory(Scanner consoleInput) throws IOException {
+    public void addAccessory(Scanner consoleInput) {
         int product_id = 0;
         String name;
-        String type = "";
+        AccessoryType type = null;
         double price;
         int stock;
         double purchase_cost;
         String compatibility;
 
+        // loops while the new ID isn't 4 characters long
         boolean pass = false;
         while (!pass) {
             System.out.print("Enter the accessory's ID: ");
@@ -73,17 +84,27 @@ public class Admin extends User{
             }
         }
         System.out.print("Enter the accessory's name: ");
-        name = consoleInput.nextLine();
-        System.out.println("What is the accessory's type: \n1) accessory kit 2) miniature 3) dice");
-        int choice = Integer.parseInt(consoleInput.nextLine());
-        if (choice == 1){
-            type = Accessory.ACCESSORY_KIT;
-        } else if (choice == 2){
-            type = Accessory.MINIATURE;
-        } else if (choice == 3){
-            type = Accessory.DICE;
-        } else {
-            System.out.println("Invalid choice");
+        name = ValidationUtils.getNonEmptyString(consoleInput, "");
+        while (true) {
+            System.out.println("What is the accessory's type: \n1) accessory kit 2) miniature 3) dice");
+            String input = consoleInput.nextLine().trim();
+            if (!input.matches("[0-9]+")) {
+                System.out.println("Invalid input. Please enter a number (1, 2, or 3).\n");
+                continue;
+            }
+            int choice = Integer.parseInt(input);
+            if (choice == 1) {
+                type = AccessoryType.accessory_kit;
+                break;
+            } else if (choice == 2) {
+                type = AccessoryType.miniature;
+                break;
+            } else if (choice == 3) {
+                type = AccessoryType.dice;
+                break;
+            } else {
+                System.out.println("Invalid choice. Please enter 1, 2, or 3.\n");
+            }
         }
         System.out.print("Enter the accessory's price: ");
         price = Double.parseDouble(consoleInput.nextLine());
@@ -94,14 +115,14 @@ public class Admin extends User{
         System.out.print("Enter the amount of stock: ");
         stock = Integer.parseInt(consoleInput.nextLine());
 
-        Product product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
-        User.stockClass.addStock(product);
-
+        Accessory product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
+//        User.stockClass.addStock(product);
+        JavaPythonBridge.run(JavaPythonBridge.ADD_ACCESSORY, product);
     }
 
 
-    public String viewProducts() {
-        return User.stockClass.showStockAdmin();
+    public void viewProducts() {
+         System.out.println(JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS, getUserID()));
     }
 
     public String toString(){

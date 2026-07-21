@@ -1,24 +1,17 @@
 package CLIbasis.CLIbasis;
 
+import Inventory.JavaPythonBridge;
 import Users.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-	private final static ArrayList<User> userList;
-
-	static {
-		try {
-			userList = User.loadUsers();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	private final static List<User> userList = User.loadUsers();
 
 
-	public static void main(String[] args) throws IOException {
+
+	static void main() {
 
         Scanner consoleInput = new Scanner(System.in);
 
@@ -32,18 +25,19 @@ public class Main {
 			int selection = 0;
 			// Checks if the user has entered anything before parsing their input
 			if (line == null){
-				System.out.println("Please enter a valid option");
+				System.out.println("Please enter a valid option\n");
 			} else {
 				try {
 					selection = Integer.parseInt(line.trim());
 				} catch (NumberFormatException e){
-					System.out.println("Please enter a valid option");
+					System.out.println("Please enter a valid option\n");
 					continue;
 				}
 			}
 
 			
 			if (selection == 0) {
+				JavaPythonBridge.run(JavaPythonBridge.CLOSE_CONNECTION);
 				System.out.println("Goodbye");
 				System.out.println("Closing program...");
 				System.out.println();
@@ -60,7 +54,7 @@ public class Main {
 						CustomerCLI.run(consoleInput, customer);
 					}
 				} else {
-					System.out.println("Invalid selection");
+					System.out.println("Invalid selection\n");
 				}
 			}
         }
