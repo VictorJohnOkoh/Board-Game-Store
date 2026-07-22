@@ -11,7 +11,7 @@ public class Main {
 
 
 
-	static void main() {
+	static void main(String[] args) {
 
         Scanner consoleInput = new Scanner(System.in);
 

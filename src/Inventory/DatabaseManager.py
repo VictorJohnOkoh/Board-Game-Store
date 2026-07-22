@@ -238,7 +238,7 @@ def add_accessory(productID: int, name: str, genretype: str, price: float, stock
         return "Product with that ID already exists"
 
 def load_users():
-    """Returns all users in the same semicolon-delimited format as UserAccount.txt"""
+    """Returns all users in a semicolon-delimited """
 
     query = "SELECT UserDetails.userid, name, role FROM main.UserDetails LEFT JOIN main.UserRole ON UserDetails.userid = UserRole.userid"
     cursor.execute(query)
