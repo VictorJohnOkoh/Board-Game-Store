@@ -125,6 +125,11 @@ public class Admin extends User{
          System.out.println(JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS, getUserID()));
     }
 
+    public void rollbackDatabase() {
+        /** Rolls back the database to the last available backup */
+        JavaPythonBridge.rollback();
+    }
+
     public String toString(){
         return String.format("%d | %s | %s", getUserID(), getUserName(), getRole());
     }

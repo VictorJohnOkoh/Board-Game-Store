@@ -37,7 +37,9 @@ public class AdminCLI {
                                 break;
                         }
                         break;
-
+                    case 3:
+                        admin.rollbackDatabase();
+                        System.out.println("Database rolled back to last backup.");    
                     case 0:
                         return;
                 }
@@ -52,6 +54,7 @@ public class AdminCLI {
         System.out.println("PLEASE SELECT ACTION BY INPUTTING THE CORRESPONDING NUMBER (or 0 for logout)");
         System.out.println("1) View all products");
         System.out.println("2) Add new product");
+        System.out.println("3) Roll back database");
         
 
         System.out.println("0) Log out");

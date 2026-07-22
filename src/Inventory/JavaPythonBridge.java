@@ -300,4 +300,12 @@ A run method typically will not return anything while a run_result method return
         return;
     }
 
+    public static void rollback() {
+        try {
+            interp.invoke(ROLLBACK);
+        } catch (Exception e) {
+            System.out.println("Error rolling back database: " + e.getMessage());
+        }
+    }
+
 }
