@@ -3,6 +3,7 @@ package Inventory;
 import jep.SharedInterpreter;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 public class JavaPythonBridge {
 
@@ -25,11 +26,16 @@ public class JavaPythonBridge {
     private final static SharedInterpreter interp = new SharedInterpreter();
 
     static {
-        // Calculate where the jep library is
-        File nativeLib = new File("lib\\jep\\jep.dll");
-        // Load the jep library
-        System.load(nativeLib.getAbsolutePath());
 
+        File jarDir;
+        // Calculate where the jep library is
+        try {
+            jarDir = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        // Load the jep library
+        System.load(new File(jarDir, "lib\\jep\\jep.dll").getAbsolutePath());
 
         String scriptPathToUse;
 
