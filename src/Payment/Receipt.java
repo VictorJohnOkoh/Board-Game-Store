@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import Users.Address;
 
-//TODO: write out the subclasses
 
 public abstract class Receipt {
     LocalDate localdate = LocalDate.now();
