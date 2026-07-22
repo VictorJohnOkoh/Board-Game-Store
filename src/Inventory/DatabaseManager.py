@@ -3,9 +3,9 @@ import sqlite3
 import shutil
 
 
-_DB_PATH = None
-_BACKUP_DIR = None
-_BACKUP_PATH = None
+_DB_PATH : str = ""
+_BACKUP_DIR : str  = ""
+_BACKUP_PATH : str = ""
 
 def init_paths():
     """Initializes the database and backup paths"""
