@@ -1,9 +1,11 @@
 package Inventory;
 
 import jep.SharedInterpreter;
-
+import jep.MainInterpreter;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JavaPythonBridge {
 
@@ -22,26 +24,28 @@ public class JavaPythonBridge {
     public static final String FILTER_COMPATIBILITY = "filter_product_compatibility";
     public static final String ROLLBACK = "rollback";
 
+    static {
+        // Point towards the jep.dll file in the lib/jep folder relative to the JAR file location
+        try {
+          File jarDir = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+          File dll = new File(jarDir, "lib\\jep\\jep.dll");
+          MainInterpreter.setJepLibraryPath(dll.getAbsolutePath());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    
     // global sharedInterpreter
     private final static SharedInterpreter interp = new SharedInterpreter();
 
     static {
 
-        File jarDir;
-        // Calculate where the jep library is
-        try {
-            jarDir = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        // Load the jep library
-        System.load(new File(jarDir, "lib\\jep\\jep.dll").getAbsolutePath());
-
         String scriptPathToUse;
 
-        // Always use the external data folder for the database
-        // absolute path to the database file
-        String DB_PATH = System.getProperty("user.dir") + "\\data\\StoreData.db";
+        // Resolve the database path from the app location first, then fall back to the working directory.
+        File dbFile = resolveDatabaseFile();
+        String DB_PATH = dbFile.getAbsolutePath();
 
         // Try to find the Python script in the source directory
         java.io.File scriptFile = new java.io.File("src\\Inventory\\DatabaseManager.py");
@@ -80,6 +84,59 @@ public class JavaPythonBridge {
             interp.runScript(scriptPathToUse);
         } catch (Exception e) {
             System.err.println("Error initializing SharedInterpreter: " + e.getMessage());
+        }
+    }
+
+    private static File resolveDatabaseFile() {
+        List<File> searchRoots = new ArrayList<>();
+
+        File codeLocation = getCodeLocation();
+        if (codeLocation != null) {
+            searchRoots.add(codeLocation);
+        }
+
+        File workingDir = new File(System.getProperty("user.dir"));
+        if (workingDir != null) {
+            searchRoots.add(workingDir);
+        }
+
+        for (File root : searchRoots) {
+            File resolved = findDatabaseFileFromRoot(root);
+            if (resolved != null) {
+                return resolved;
+            }
+        }
+
+        return new File(workingDir, "data" + File.separator + "StoreData.db");
+    }
+
+    private static File findDatabaseFileFromRoot(File startRoot) {
+        File current = startRoot;
+        for (int i = 0; i < 8 && current != null; i++) {
+            File candidate = new File(current, "data" + File.separator + "StoreData.db");
+            if (candidate.exists()) {
+                return candidate;
+            }
+
+            File nestedCandidate = new File(current, "Board Game Store" + File.separator + "data" + File.separator + "StoreData.db");
+            if (nestedCandidate.exists()) {
+                return nestedCandidate;
+            }
+
+            current = current.getParentFile();
+        }
+        return null;
+    }
+
+    private static File getCodeLocation() {
+        try {
+            File codeSource = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            if (codeSource.isFile()) {
+                return codeSource.getParentFile();
+            }
+            return codeSource;
+        } catch (URISyntaxException e) {
+            return null;
         }
     }
 
