@@ -232,4 +232,15 @@ A run method typically will not return anything while a run_result method return
         }
         return run_result(UPDATE_STOCK, sb.toString());
     }
+
+    public static void close() {
+        try {
+            interp.close();
+        } catch (Exception e) {
+            System.out.println("Error closing SharedInterpreter: " + e.getMessage());
+        }
+        System.out.println("Bridge closed successfully.");
+        return;
+    }
+
 }

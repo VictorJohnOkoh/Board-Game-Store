@@ -1,8 +1,6 @@
 package CLIbasis.CLIbasis;
 
 import Users.Customer;
-import java.io.IOException;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class CustomerCLI {
