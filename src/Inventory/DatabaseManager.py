@@ -10,7 +10,10 @@ _BACKUP_PATH : str = ""
 def init_paths():
     """Initializes the database and backup paths"""
     global _DB_PATH, _BACKUP_DIR, _BACKUP_PATH
-    _DB_PATH = os.path.join(os.getcwd(), 'data', 'StoreData.db')
+    if 'db_path' in globals() and db_path:
+        _DB_PATH = globals()['db_path']         
+    else:
+        _DB_PATH = os.path.join(os.getcwd(), 'data', 'StoreData.db')
     script_dir = os.path.dirname(_DB_PATH)
     _BACKUP_DIR = os.path.join(script_dir, 'backups')
     _BACKUP_PATH = os.path.join(_BACKUP_DIR, 'StoreData_backup.db')
