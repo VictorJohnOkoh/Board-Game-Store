@@ -8,19 +8,19 @@ _BACKUP_DIR = None
 _BACKUP_PATH = None
 
 def init_paths():
+    """Initializes the database and backup paths"""
     global _DB_PATH, _BACKUP_DIR, _BACKUP_PATH
-    if 'db_path' in globals() and db_path:
-        _DB_PATH = db_path
-    else:
-        _DB_PATH = os.path.join(os.getcwd(), 'data', 'StoreData.db')
+    _DB_PATH = os.path.join(os.getcwd(), 'data', 'StoreData.db')
     script_dir = os.path.dirname(_DB_PATH)
     _BACKUP_DIR = os.path.join(script_dir, 'backups')
     _BACKUP_PATH = os.path.join(_BACKUP_DIR, 'StoreData_backup.db')
 
 def rollback():
+    """Restores the database from the backup"""
     shutil.copy2(_BACKUP_PATH, _DB_PATH)
 
 def create_backup():
+    """Creates a backup of the database"""
     if not os.path.exists(_BACKUP_DIR):
         os.makedirs(_BACKUP_DIR)
     shutil.copy2(_DB_PATH, _BACKUP_PATH)
