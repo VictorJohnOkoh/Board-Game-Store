@@ -23,12 +23,38 @@ public class JavaPythonBridge {
     public static final String FILTER_ID = "filter_product_id";
     public static final String FILTER_COMPATIBILITY = "filter_product_compatibility";
     public static final String ROLLBACK = "rollback";
+    
+// jep dll files for windows and Unix
+    private static String win_jep_dll = "lib" + File.separator + "jep" + File.separator + "jep.dll";
+    private static String unix_jep_dll = "lib" + File.separator + "jep" + File.separator + "libjep.so";
+    private static String mac_jep_dll = "lib" + File.separator + "jep" + File.separator + "libjep.jnilib";
+    private static String jep_dll = "";
+
+// get the current OS
+    private static final String os = System.getProperty("os.name").toLowerCase();
+
+    
 
     static {
-        // Point towards the jep.dll file in the lib/jep folder relative to the JAR file location
+        // Determine the correct jep dll file based on the operating system
+        switch(os) {
+            case "windows 10":
+            case "windows 11":
+                jep_dll = win_jep_dll;
+                break;
+            case "linux":
+                jep_dll = unix_jep_dll;
+                break;
+            case "mac os x":
+                jep_dll = mac_jep_dll;
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported operating system: " + os);
+        }
+        
         try {
           File jarDir = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-          File dll = new File(jarDir, "lib\\jep\\jep.dll");
+          File dll = new File(jarDir, jep_dll);
           MainInterpreter.setJepLibraryPath(dll.getAbsolutePath());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -48,17 +74,17 @@ public class JavaPythonBridge {
         String DB_PATH = dbFile.getAbsolutePath();
 
         // Try to find the Python script in the source directory
-        java.io.File scriptFile = new java.io.File("src\\Inventory\\DatabaseManager.py");
+        java.io.File scriptFile = new java.io.File("src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py");
         // temporary path for extracted Python script
         String TEMP_SCRIPT_PATH;
         if (scriptFile.exists()) {
             TEMP_SCRIPT_PATH = null;
-            scriptPathToUse = "src\\Inventory\\DatabaseManager.py";
+            scriptPathToUse = "src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py";
         } else {
             // Fallback: extract script from JAR resources to a temp file
             try {
                 java.io.File tempScript = java.io.File.createTempFile("DatabaseManager", ".py");
-                java.io.InputStream scriptIn = JavaPythonBridge.class.getResourceAsStream("/Inventory/DatabaseManager.py");
+                java.io.InputStream scriptIn = JavaPythonBridge.class.getResourceAsStream(File.separator + "Inventory" + File.separator + "DatabaseManager.py");
                 if (scriptIn != null) {
                     java.io.OutputStream scriptOut = new java.io.FileOutputStream(tempScript);
                     byte[] buffer = new byte[8192];
@@ -71,11 +97,11 @@ public class JavaPythonBridge {
                     TEMP_SCRIPT_PATH = tempScript.getAbsolutePath();
                     scriptPathToUse = TEMP_SCRIPT_PATH;
                 } else {
-                    scriptPathToUse = "src\\Inventory\\DatabaseManager.py";
+                    scriptPathToUse = "src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py";
                 }
             } catch (Exception e) {
                 System.err.println("Error extracting Python script: " + e.getMessage());
-                scriptPathToUse = "src\\Inventory\\DatabaseManager.py";
+                scriptPathToUse = "src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py";
             }
         }
 
