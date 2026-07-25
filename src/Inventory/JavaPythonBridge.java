@@ -1,11 +1,13 @@
 package Inventory;
 
-import jep.SharedInterpreter;
-import jep.MainInterpreter;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import jep.MainInterpreter;
+import jep.SharedInterpreter;
 
 public class JavaPythonBridge {
 
@@ -25,36 +27,18 @@ public class JavaPythonBridge {
     public static final String ROLLBACK = "rollback";
     
 // jep dll files for windows and Unix
-    private static String win_jep_dll = "lib" + File.separator + "jep" + File.separator + "jep.dll";
-    private static String unix_jep_dll = "lib" + File.separator + "jep" + File.separator + "libjep.so";
-    private static String mac_jep_dll = "lib" + File.separator + "jep" + File.separator + "libjep.jnilib";
-    private static String jep_dll = "";
-
-// get the current OS
-    private static final String os = System.getProperty("os.name").toLowerCase();
+    private static final String winJepDll = "lib" + File.separator + "jep" + File.separator + "jep.dll";
+    private static final String unixJepDll = "lib" + File.separator + "jep" + File.separator + "libjep.so";
+    private static final String macJepDll = "lib" + File.separator + "jep" + File.separator + "libjep.jnilib";
+    private static final String jepDll = resolveOsVersion();
 
     
 
     static {
-        // Determine the correct jep dll file based on the operating system
-        switch(os) {
-            case "windows 10":
-            case "windows 11":
-                jep_dll = win_jep_dll;
-                break;
-            case "linux":
-                jep_dll = unix_jep_dll;
-                break;
-            case "mac os x":
-                jep_dll = mac_jep_dll;
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported operating system: " + os);
-        }
         
         try {
           File jarDir = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-          File dll = new File(jarDir, jep_dll);
+          File dll = new File(jarDir, jepDll);
           MainInterpreter.setJepLibraryPath(dll.getAbsolutePath());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -74,25 +58,24 @@ public class JavaPythonBridge {
         String DB_PATH = dbFile.getAbsolutePath();
 
         // Try to find the Python script in the source directory
-        java.io.File scriptFile = new java.io.File("src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py");
+        java.io.File scriptFile = new java.io.File("Inventory" + File.separator + "DatabaseManager.py");
         // temporary path for extracted Python script
         String TEMP_SCRIPT_PATH;
         if (scriptFile.exists()) {
-            TEMP_SCRIPT_PATH = null;
             scriptPathToUse = "src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py";
         } else {
             // Fallback: extract script from JAR resources to a temp file
             try {
                 java.io.File tempScript = java.io.File.createTempFile("DatabaseManager", ".py");
-                java.io.InputStream scriptIn = JavaPythonBridge.class.getResourceAsStream(File.separator + "Inventory" + File.separator + "DatabaseManager.py");
+                java.io.InputStream scriptIn = JavaPythonBridge.class.getResourceAsStream("/Inventory/DatabaseManager.py");
                 if (scriptIn != null) {
-                    java.io.OutputStream scriptOut = new java.io.FileOutputStream(tempScript);
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    while ((bytesRead = scriptIn.read(buffer)) != -1) {
-                        scriptOut.write(buffer, 0, bytesRead);
+                    try (java.io.OutputStream scriptOut = new java.io.FileOutputStream(tempScript)) {
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+                        while ((bytesRead = scriptIn.read(buffer)) != -1) {
+                            scriptOut.write(buffer, 0, bytesRead);
+                        }
                     }
-                    scriptOut.close();
                     scriptIn.close();
                     TEMP_SCRIPT_PATH = tempScript.getAbsolutePath();
                     scriptPathToUse = TEMP_SCRIPT_PATH;
@@ -122,9 +105,8 @@ public class JavaPythonBridge {
         }
 
         File workingDir = new File(System.getProperty("user.dir"));
-        if (workingDir != null) {
-            searchRoots.add(workingDir);
-        }
+        searchRoots.add(workingDir);
+        
 
         for (File root : searchRoots) {
             File resolved = findDatabaseFileFromRoot(root);
@@ -165,6 +147,21 @@ public class JavaPythonBridge {
             return null;
         }
     }
+
+/** Choose which dll to load based on the OS*/
+    private static String resolveOsVersion() {
+        String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        if (osName.contains("windows")) {
+            return winJepDll;
+        } else if (osName.contains("linux")) {
+            return unixJepDll;
+        } else if (osName.contains("mac")) {
+            return macJepDll;
+        } else {
+            return "unknown";
+        }
+    }
+
 
 /*
 A run method typically will not return anything while a run_result method returns some value(s)
