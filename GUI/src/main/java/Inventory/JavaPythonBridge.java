@@ -38,7 +38,7 @@ public class JavaPythonBridge {
         
         try {
           File jarDir = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-          File dll = new File(jepDll);
+          File dll = new File(jarDir, jepDll);
           MainInterpreter.setJepLibraryPath(dll.getAbsolutePath());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -58,7 +58,7 @@ public class JavaPythonBridge {
         String DB_PATH = dbFile.getAbsolutePath();
 
         // Try to find the Python script in the source directory
-        java.io.File scriptFile = new java.io.File("Inventory" + File.separator + "DatabaseManager.py");
+        File scriptFile = new File("Inventory" + File.separator + "DatabaseManager.py");
         // temporary path for extracted Python script
         String TEMP_SCRIPT_PATH;
         if (scriptFile.exists()) {
@@ -66,7 +66,7 @@ public class JavaPythonBridge {
         } else {
             // Fallback: extract script from JAR resources to a temp file
             try {
-                java.io.File tempScript = java.io.File.createTempFile("DatabaseManager", ".py");
+                File tempScript = File.createTempFile("DatabaseManager", ".py");
                 java.io.InputStream scriptIn = JavaPythonBridge.class.getResourceAsStream("/Inventory/DatabaseManager.py");
                 if (scriptIn != null) {
                     try (java.io.OutputStream scriptOut = new java.io.FileOutputStream(tempScript)) {
