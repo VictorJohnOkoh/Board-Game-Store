@@ -1,6 +1,7 @@
 package Inventory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +36,12 @@ public class JavaPythonBridge {
     
 
     static {
-        
-        try {
-          File jarDir = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-          File dll = new File(jepDll);
-          MainInterpreter.setJepLibraryPath(dll.getAbsolutePath());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        File dll = new File(jepDll);
+        MainInterpreter.setJepLibraryPath(dll.getAbsolutePath());
+
     }
     
-    
+        
     // global sharedInterpreter
     private final static SharedInterpreter interp = new SharedInterpreter();
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
@@ -8,17 +7,17 @@
 <VBox alignment="TOP_CENTER" spacing="20.0" xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="gui.app.controllers.AdminMenuController"
-      prefHeight="500.0" prefWidth="700.0" style="-fx-padding: 20;">
+      prefHeight="500.0" prefWidth="700.0" style="-fx-padding: 20;" stylesheets="@welcome-tray.css">
 
     <Label fx:id="welcomeLabel" text="" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
 
-    <Text text="Admin Menu" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Text styleClass="title-text" text="Admin Menu" />
 
     <VBox alignment="CENTER" spacing="15.0">
-        <Button text="View All Products" prefWidth="250" />
-        <Button text="Add New Product" prefWidth="250" />
-        <Button text="Rollback Database" prefWidth="250" />
-        <Button text="Logout" onAction="#handleExit" prefWidth="250" />
+        <Button onAction="#handleViewProducts" text="View All Products" prefWidth="250" styleClass="primary-button" />
+        <Button onAction="#handleAddProduct" text="Add New Product" prefWidth="250" styleClass="primary-button" />
+        <Button onAction="#handleRollback" text="Rollback Database" prefWidth="250" styleClass="secondary-button" />
+        <Button onAction="#handleExit" text="Logout" prefWidth="250" styleClass="secondary-button" />
     </VBox>
 
 </VBox>

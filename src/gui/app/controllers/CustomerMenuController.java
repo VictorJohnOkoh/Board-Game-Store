@@ -16,7 +16,7 @@ public class CustomerMenuController {
     public void initialize(User user) {
         this.currentUser = user;
         if (welcomeLabel != null) {
-            welcomeLabel.setText("Welcome, " + user.getUserName() + " (" + user.getRole().toUpperCase() + ")");
+            welcomeLabel.setText("Welcome, " + user.getName() + " (" + user.getRole().toUpperCase() + ")");
         }
     }
 
