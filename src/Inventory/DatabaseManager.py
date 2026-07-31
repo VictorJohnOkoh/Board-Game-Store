@@ -104,6 +104,29 @@ def get_admin_products(ID: int):
     return result
 
 
+def get_admin_products_raw(ID: int):
+    """Returns all products in a parseable semicolon-delimited format.
+    Each line: pid;category;type;name;price;quantity;pcost;extra
+    Category is 'boardgame' or 'accessory'.
+    Extra field is noplayers for board games, compatibility for accessories.
+    """
+    if get_user_role(ID) != 'admin':
+        return "You don't have the necessary permissions"
+
+    query =  "SELECT BoardGame.id, 'boardgame', genre, name, price, quantity, pcost, noplayers FROM main.BoardGame LEFT JOIN main.BoardGamePlayers ON BoardGame.id = BoardGamePlayers.id UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, pcost, compatibility FROM main.Accessory LEFT JOIN main.AccessoryCompatibility AC on Accessory.id = AC.id ORDER BY price DESC"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    result = ""
+    for row in rows:
+        if row[1] == 'boardgame':
+            line = f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]:.2f};{row[5]};{row[6]:.2f};{row[7]}"
+        else:
+            line = f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]:.2f};{row[5]};{row[6]:.2f};{row[7]}"
+        result += line + "\n"
+
+    return result
+
+
 def get_products():
     """Returns information viewable by customers about all board games and accessories stored in the store database"""
 
@@ -226,7 +249,7 @@ def add_board_game(productID: int, name: str, genretype: str, price: float, stoc
 
 
 def add_accessory(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, compatibility: str):
-    """Adds a new accessory to the Accessory and AccessoryCompatibility  tables"""
+    """Adds a new accessory to the Accessory and AccessoryCompatibility tables"""
 
     create_backup()
     try:
@@ -346,49 +369,3 @@ def check_db():
             cursor.execute(query, (table,))
         except sqlite3.OperationalError:
             print("Database Corrupted: some table(s) don't exist")
-
-# Structure to run functions by passing JSON data
-#
-# def main():
-#
-#     # checks if a function argument was passed
-#     if len(sys.argv) < 2:
-#         print("Error no function targeted")
-#         sys.exit(1)
-#
-#     target_function = sys.argv[1]
-#     input_data = sys.stdin.read()
-#     if not input_data:
-#         print("Error: no JSON received via stdin")
-#         return
-#     data = json.loads(input_data)
-#
-#     # runs the function associated to the argument passed and takes in arguments piped from Java
-#     if target_function == "getUserRole":
-#         getUserRole(int(data[0]))
-#     elif target_function == "getUserDetails":
-#         getUserDetails()
-#     elif target_function == "getUserAddress":
-#         getUserAddress(int(data[0]))
-#     elif target_function == "getAdminProducts":
-#         getAdminProducts(int(data[0]))
-#     elif target_function == "getProducts":
-#         getProducts()
-#     elif target_function == "filterProductCompatibility":
-#         filterProductCompatibility(data[0])
-#     elif target_function == "updateStock":
-#         updateStock(int(data['id']), int(data['stock']), data['category'])
-#     elif target_function == "addBoardGame":
-#         addBoardGame(int(data['id']), data['name'], data['type'], float(data['price']), int(data['stock']), float(data['cost']), int(data['players']))
-#     elif target_function == "addAccessory":
-#         addAccessory(int(data['id']), data['name'], data['type'], float(data['price']), int(data['stock']), float(data['cost']), data['compatibility'])
-#     elif target_function == "loadUsers":
-#         loadUsers()
-#     elif target_function == " close_connection":
-#         close_connection()
-#     else:
-#         print(f"Error: unknown function name {target_function}")
-#         sys.exit(1)
-#
-# if __name__ == "__main__":
-#     main()
