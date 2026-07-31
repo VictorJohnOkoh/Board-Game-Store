@@ -27,7 +27,7 @@ public class Customer extends User{
 
     /** Returns a string representation of the customer*/
     public String toString() {
-        return String.format("%d | %s | %s", getUserID(), getUserName(), getRole());
+        return String.format("%d | %s | %s", getUserID(), getName(), getRole());
     }
 
 

@@ -26,7 +26,7 @@ public abstract class User {
        return userID;
    }
 
-   public String getUserName(){
+   public String getName(){
        return name;
    }
 
@@ -57,7 +57,6 @@ public abstract class User {
    }
 
     /** Loads the User accounts in the database into a list of User objects that can be accessed*/
-    @SuppressWarnings({"ConstantValue", "DataFlowIssue"})
     public static List<User> loadUsers(){
         List<User> userList = new ArrayList<>(List.of());
         String unparsedData = JavaPythonBridge.run_result(JavaPythonBridge.GET_USER_DETAILS);

@@ -65,7 +65,7 @@ public class Admin extends User{
     public void addAccessory(Scanner consoleInput) {
         int product_id = 0;
         String name;
-        AccessoryType type = null;
+        AccessoryType type;
         double price;
         int stock;
         double purchase_cost;
@@ -125,12 +125,13 @@ public class Admin extends User{
          System.out.println(JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS, getUserID()));
     }
 
+    /** Rolls back the database to the last available backup */
     public void rollbackDatabase() {
-        /** Rolls back the database to the last available backup */
+
         JavaPythonBridge.rollback();
     }
 
     public String toString(){
-        return String.format("%d | %s | %s", getUserID(), getUserName(), getRole());
+        return String.format("%d | %s | %s", getUserID(), getName(), getRole());
     }
 }
