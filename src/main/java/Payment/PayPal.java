@@ -18,7 +18,10 @@ public class PayPal implements PaymentMethod{
             email = consoleInput.nextLine();
             if (!isEmailValid(email)) {
                 System.out.println("Invalid email address provided\n");
+            } else {
+                pass = true;
             }
+
         }
 
     }
