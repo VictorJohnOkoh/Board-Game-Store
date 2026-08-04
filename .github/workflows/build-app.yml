@@ -128,7 +128,21 @@ jobs:
           # is meaningful for a tool-managed install but not for a private vendored copy.
           find "${PYROOT}" -name EXTERNALLY-MANAGED -delete || true
           "${PYEXE}" -m pip install --no-cache-dir "jep==${JEP_VERSION}"
-          "${PYEXE}" -c "import jep, os; print('jep package at', os.path.dirname(jep.__file__))"
+
+          # NB: `import jep` deliberately raises "Jep is not supported in standalone Python,
+          # it must be embedded in Java" - the package can only be imported from an
+          # interpreter that Java started. Locate it without importing, then assert the
+          # native library and the .py files are both present, since shipping the binaries
+          # without the Python package is exactly the bug this rewrite fixes.
+          JEP_DIR=$("${PYEXE}" -c "import importlib.util, os; print(os.path.dirname(importlib.util.find_spec('jep').origin))")
+          echo "jep package at ${JEP_DIR}"
+          ls -la "${JEP_DIR}"
+          if ! ls "${JEP_DIR}"/jep.dll "${JEP_DIR}"/libjep.so "${JEP_DIR}"/libjep.dylib "${JEP_DIR}"/*.jnilib 2>/dev/null | head -1 | grep -q .; then
+            echo "::error::no jep native library found in ${JEP_DIR}"
+            exit 1
+          fi
+          test -f "${JEP_DIR}/java_import_hook.py" \
+            || { echo "::error::jep python package incomplete"; exit 1; }
 
       - name: Assemble bundle
         run: |
@@ -154,24 +168,18 @@ jobs:
           echo "=== bundle contents ==="
           ls -la "${BUNDLE}"
 
-      # Proves the bundle actually starts a real interpreter and reads the database,
-      # rather than only proving that it was assembled.
+      # Runs the shipped launcher itself, not an equivalent java command, so the test
+      # covers run.bat / run.sh and the environment they set. Feeding "0" selects Exit.
       - name: Smoke test the bundle
         run: |
-          set -euo pipefail
+          set -uo pipefail
           BUNDLE="${PWD}/dist/Board Game Store"
-          export PYTHONHOME="${BUNDLE}/python"
           if [ "${RUNNER_OS}" = "Windows" ]; then
-            export PATH="${BUNDLE}/python:${PATH}"
-            SEP=";"
+            # cmd //c (double slash) stops Git Bash rewriting /c as a path.
+            OUT=$(echo 0 | cmd //c "$(cygpath -w "${BUNDLE}/Scripts/run.bat")" 2>&1) || true
           else
-            export LD_LIBRARY_PATH="${BUNDLE}/python/lib:${LD_LIBRARY_PATH:-}"
-            export DYLD_LIBRARY_PATH="${BUNDLE}/python/lib:${DYLD_LIBRARY_PATH:-}"
-            SEP=":"
+            OUT=$(echo 0 | "${BUNDLE}/Scripts/run.sh" 2>&1) || true
           fi
-          OUT=$(echo 0 | java --enable-native-access=ALL-UNNAMED \
-            -cp "${BUNDLE}/bgms.jar${SEP}${BUNDLE}/lib/*" \
-            CLIbasis.CLIbasis.Main 2>&1) || true
           echo "${OUT}"
           # The welcome menu only lists users if DatabaseManager.py ran and queried SQLite.
           if ! echo "${OUT}" | grep -q "PLEASE SELECT USER"; then
