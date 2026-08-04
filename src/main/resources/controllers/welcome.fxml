@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<?import javafx.scene.layout.HBox?>
+<VBox alignment="TOP_CENTER" spacing="15.0" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="gui.app.contollers.WelcomeController"
+      prefHeight="500.0" prefWidth="700.0" style="-fx-padding: 20;">
+
+    <Text text="Welcome to Board Game Store" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Text text="Please select a user to continue (or 0 to exit)" style="-fx-font-size: 14px; -fx-fill: gray;" />
+
+    <TableView fx:id="userTable" prefHeight="350.0" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="80" />
+            <TableColumn fx:id="nameColumn" text="Name" prefWidth="200" />
+            <TableColumn fx:id="roleColumn" text="Role" prefWidth="120" />
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button text="Login Selected User" onAction="#handleLogin" prefWidth="200" />
+        <Button text="Exit" onAction="#handleExit" prefWidth="200" />
+    </HBox>
+
+</VBox>

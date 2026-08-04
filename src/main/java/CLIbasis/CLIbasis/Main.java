@@ -1,0 +1,87 @@
+package CLIbasis.CLIbasis;
+
+import Bridge.JavaPythonBridge;
+import Users.Admin;
+import Users.Customer;
+import Users.User;
+
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+	private final static List<User> userList = User.loadUsers();
+
+
+
+	public static void main(String[] args) {
+
+        Scanner consoleInput = new Scanner(System.in);
+
+
+		System.out.println("WELCOME");
+        
+        while (true) {
+            printWelcomeMenu();
+
+            String line = readLine(consoleInput);
+			int selection = 0;
+			// Checks if the user has entered anything before parsing their input
+			if (line == null){
+				System.out.println("Please enter a valid option\n");
+			} else {
+				try {
+					selection = Integer.parseInt(line.trim());
+				} catch (NumberFormatException e){
+					System.out.println("Please enter a valid option\n");
+					continue;
+				}
+			}
+
+			
+			if (selection == 0) {
+				JavaPythonBridge.run(JavaPythonBridge.CLOSE_CONNECTION);
+				JavaPythonBridge.close();
+				System.out.println("Goodbye");
+				System.out.println("Closing program...");
+				System.out.println();
+				consoleInput.close();
+				return;
+			} else {
+				if (selection <= userList.size() && selection > 0) {
+					String userRole = userList.get(selection-1).getRole();
+					if (userRole.equalsIgnoreCase("admin")) {
+						Admin admin = (Admin) userList.get(selection-1);
+						AdminCLI.run(consoleInput, admin);
+					} else {
+						Customer customer = (Customer) userList.get(selection-1);
+						CustomerCLI.run(consoleInput, customer);
+					}
+				} else {
+					System.out.println("Invalid selection\n");
+				}
+			}
+        }
+    }
+
+    private static void printWelcomeMenu() {
+
+		//
+        System.out.println("PLEASE SELECT USER BY INPUTTING THE CORRESPONDING NUMBER (or 0 for exit)");
+		int i = 1;
+		for  (User user : userList) {
+			String line = String.format("%d) %s", i, user.toString());
+			System.out.println(line);
+			i++;
+		}
+
+
+        System.out.println("0) Exit");
+    }
+
+    private static String readLine(Scanner consoleInput) {
+        if (!consoleInput.hasNextLine()) {
+            return null;
+        }
+        return consoleInput.nextLine();
+    }
+}

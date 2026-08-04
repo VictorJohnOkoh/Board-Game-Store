@@ -1,0 +1,291 @@
+name: Build Cross-Platform Bundles
+
+# JEP embeds a *native* CPython interpreter, so there is no such thing as a single
+# cross-platform artifact: jep.dll / libjep.so / libjep.dylib each link against that
+# platform's libpython. The jar itself stays platform-neutral; the *bundle* around it
+# (jar + a vendored CPython 3.11 with jep installed + launcher) is platform-specific.
+#
+# See docs/research/jep-native-library-loading.md for why the previous approach
+# (extracting jep.dll into jar resources) could never work: the binaries alone are
+# useless without jep's Python package, and Windows will not resolve python311.dll
+# from the folder jep.dll was loaded from.
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '25'
+  PYTHON_VERSION: '3.11'
+  JEP_VERSION: '4.3.1'
+
+jobs:
+  # -------------------------------------------------------------------
+  # STAGE 1: Build the platform-neutral application jar once.
+  # -------------------------------------------------------------------
+  build-jar:
+    name: Build application jar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build jar
+        run: mvn -B clean package -DskipTests
+
+      # Only jep is needed at runtime for the CLI bundle. JavaFX is a compile-time
+      # dependency here and is not required to launch CLIbasis.CLIbasis.Main.
+      - name: Collect runtime dependencies
+        run: >
+          mvn -B dependency:copy-dependencies
+          -DincludeArtifactIds=jep
+          -DoutputDirectory=target/runtime-libs
+
+      - name: Upload jar and runtime libs
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-jar
+          path: |
+            target/*.jar
+            target/runtime-libs/
+          if-no-files-found: error
+
+  # -------------------------------------------------------------------
+  # STAGE 2: Assemble one self-contained bundle per platform.
+  # -------------------------------------------------------------------
+  bundle:
+    name: Bundle for ${{ matrix.label }}
+    needs: build-jar
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # fxplatform is the classifier openjfx uses for its native-bearing jars.
+          # macos-latest runners are arm64, hence mac-aarch64 rather than mac.
+          - os: windows-latest
+            label: windows
+            fxplatform: win
+          - os: ubuntu-latest
+            label: linux
+            fxplatform: linux
+          - os: macos-latest
+            label: macos
+            fxplatform: mac-aarch64
+    defaults:
+      run:
+        # Windows runners ship Git Bash, so one set of bash steps covers all three OSes.
+        shell: bash
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      # jep compiles a C extension against the JDK headers at pip-install time,
+      # so JAVA_HOME must be set here, not just in the jar job.
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Set up uv
+        # No floating v9 tag is published, so this is pinned to an exact release.
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          # enable-cache defaults to "auto", which switches the uv package cache on and
+          # then warns that nothing matches **/uv.lock or **/requirements*.txt. uv is
+          # only used here to install a Python interpreter, never to resolve
+          # dependencies, so there is nothing worth caching.
+          enable-cache: false
+
+      - name: Download jar and runtime libs
+        uses: actions/download-artifact@v8
+        with:
+          name: app-jar
+          path: artifacts
+
+      # uv installs python-build-standalone builds, which are relocatable - an
+      # actions/setup-python interpreter is not, and would break once copied.
+      - name: Vendor CPython ${{ env.PYTHON_VERSION }}
+        run: |
+          set -euo pipefail
+          uv python install "${PYTHON_VERSION}" --install-dir "${PWD}/pyvendor"
+          # uv also creates an unversioned alias (a symlink/junction) next to the real
+          # directory. Globbing with a literal dot after the minor version selects only
+          # the real one: cpython-3.11.15-... matches, cpython-3.11-... does not.
+          PYROOT=$(ls -d "${PWD}"/pyvendor/cpython-${PYTHON_VERSION}.*/ | head -1)
+          echo "PYROOT=${PYROOT%/}" >> "$GITHUB_ENV"
+          echo "Vendored interpreter: ${PYROOT}"
+
+      - name: Install jep into the vendored interpreter
+        run: |
+          set -euo pipefail
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            PYEXE="${PYROOT}/python.exe"
+          else
+            PYEXE="${PYROOT}/bin/python3"
+          fi
+          # python-build-standalone marks itself PEP 668 externally-managed; that marker
+          # is meaningful for a tool-managed install but not for a private vendored copy.
+          find "${PYROOT}" -name EXTERNALLY-MANAGED -delete || true
+          "${PYEXE}" -m pip install --no-cache-dir "jep==${JEP_VERSION}"
+
+          # NB: `import jep` deliberately raises "Jep is not supported in standalone Python,
+          # it must be embedded in Java" - the package can only be imported from an
+          # interpreter that Java started. Locate it without importing, then assert the
+          # native library and the .py files are both present, since shipping the binaries
+          # without the Python package is exactly the bug this rewrite fixes.
+          JEP_DIR=$("${PYEXE}" -c "import importlib.util, os; print(os.path.dirname(importlib.util.find_spec('jep').origin))")
+          echo "jep package at ${JEP_DIR}"
+          ls -la "${JEP_DIR}"
+          # Deliberately no pipeline here: `ls a b c` exits non-zero when ANY argument is
+          # missing, and this shell runs with pipefail, so `ls ... | grep` would report
+          # failure even when the library was found.
+          NATIVE_LIB=""
+          for cand in "${JEP_DIR}"/jep.dll "${JEP_DIR}"/libjep.so "${JEP_DIR}"/libjep.dylib "${JEP_DIR}"/*.jnilib; do
+            if [ -f "${cand}" ]; then NATIVE_LIB="${cand}"; break; fi
+          done
+          if [ -z "${NATIVE_LIB}" ]; then
+            echo "::error::no jep native library found in ${JEP_DIR}"
+            exit 1
+          fi
+          echo "native library: ${NATIVE_LIB}"
+          test -f "${JEP_DIR}/java_import_hook.py" \
+            || { echo "::error::jep python package incomplete"; exit 1; }
+
+      # JavaFX natives are platform-specific, exactly like jep's. -Djavafx.platform picks
+      # the classifier; resolving this on the runner rather than in the shared jar job is
+      # what makes each bundle carry the right binaries.
+      - name: Collect JavaFX for ${{ matrix.fxplatform }}
+        run: |
+          set -euo pipefail
+          mvn -B dependency:copy-dependencies \
+            -DincludeGroupIds=org.openjfx \
+            -Djavafx.platform=${{ matrix.fxplatform }} \
+            -DoutputDirectory="${PWD}/fxlibs"
+          ls -la fxlibs
+
+      - name: Assemble bundle
+        run: |
+          set -euo pipefail
+          BUNDLE="dist/Board Game Store"
+          mkdir -p "${BUNDLE}/lib" "${BUNDLE}/Scripts" "${BUNDLE}/javafx"
+
+          # Only the classifier-bearing jars carry module-info and the native libraries;
+          # the unclassified ones are ~300-byte stubs. Copying both would put two jars
+          # declaring the same module on the module path.
+          set -- fxlibs/*-${{ matrix.fxplatform }}.jar
+          if [ "$#" -eq 0 ] || [ ! -f "$1" ]; then
+            echo "::error::no JavaFX jars for classifier ${{ matrix.fxplatform }}"
+            ls -la fxlibs || true
+            exit 1
+          fi
+          cp "$@" "${BUNDLE}/javafx/"
+
+          # Fail loudly rather than silently picking the wrong jar if the build ever
+          # starts emitting more than one (sources, javadoc, shaded, ...).
+          # Positional params rather than `ls | wc -l`: no pipeline, so pipefail can't
+          # turn a successful lookup into a step failure.
+          set -- artifacts/*.jar
+          if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+            echo "::error::expected exactly 1 application jar, found $#"
+            ls -la artifacts/ || true
+            exit 1
+          fi
+          cp "$1" "${BUNDLE}/bgms.jar"
+          cp artifacts/runtime-libs/*.jar "${BUNDLE}/lib/"
+          cp -r data "${BUNDLE}/data"
+          cp packaging/run.bat packaging/run.sh "${BUNDLE}/Scripts/"
+          chmod +x "${BUNDLE}/Scripts/run.sh"
+          cp -r "${PYROOT}" "${BUNDLE}/python"
+
+          echo "=== bundle contents ==="
+          ls -la "${BUNDLE}"
+
+      # The launcher now starts the GUI, which needs a display, so the JEP/database chain
+      # is exercised headlessly through the CLI entry point that is still in the jar.
+      # This is the fragile part of the stack - embedded CPython, jep's native library,
+      # SQLite - and it must be covered on every platform.
+      - name: Smoke test JEP and database
+        run: |
+          set -uo pipefail
+          BUNDLE="${PWD}/dist/Board Game Store"
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            B=$(cygpath -w "${BUNDLE}")
+            export PYTHONHOME="${B}\\python"
+            CP="${B}\\bgms.jar;${B}\\lib\\*"
+          else
+            export PYTHONHOME="${BUNDLE}/python"
+            CP="${BUNDLE}/bgms.jar:${BUNDLE}/lib/*"
+          fi
+          # PYTHONHOME alone is enough: once LibraryLocator finds the jep package it
+          # preloads the CPython shared library itself.
+          OUT=$(echo 0 | java --enable-native-access=ALL-UNNAMED -cp "${CP}" CLIbasis.CLIbasis.Main 2>&1) || true
+          echo "${OUT}"
+          # The welcome menu only lists users if DatabaseManager.py ran and queried SQLite.
+          if ! echo "${OUT}" | grep -q "PLEASE SELECT USER"; then
+            echo "::error::bundle failed to reach the user menu"
+            exit 1
+          fi
+          if echo "${OUT}" | grep -qi "can't find dependent libraries\|UnsatisfiedLinkError"; then
+            echo "::error::native library still unresolved"
+            exit 1
+          fi
+          echo "Smoke test passed."
+
+      # Verifies the shipped launcher, the JavaFX module path and the FXML resource
+      # lookups - the exact things that were broken. Linux only, because it is the one
+      # runner where a virtual display is reliably available.
+      - name: Smoke test GUI startup (Linux)
+        if: matrix.label == 'linux'
+        run: |
+          set -uo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb
+          BUNDLE="${PWD}/dist/Board Game Store"
+          # The GUI has no exit condition, so staying alive IS the pass signal:
+          # timeout kills it and reports 124. Anything else means it died on its own.
+          # `|| RC=$?` is required: GitHub starts this shell as `bash -e -o pipefail`,
+          # and `set -uo pipefail` above does NOT clear that -e, so an unguarded 124
+          # would abort the step before the exit code could even be inspected.
+          RC=0
+          timeout 25 xvfb-run -a "${BUNDLE}/Scripts/run.sh" > gui.log 2>&1 || RC=$?
+          echo "--- gui output ---"
+          cat gui.log || true
+          if [ "${RC}" -ne 124 ]; then
+            echo "::error::GUI exited on its own (rc=${RC}); it should have stayed running"
+            exit 1
+          fi
+          if grep -q "Exception\|Caused by:" gui.log; then
+            echo "::error::GUI logged an exception during startup"
+            exit 1
+          fi
+          echo "GUI startup test passed (stayed running under xvfb)."
+
+      - name: Archive bundle
+        run: |
+          set -euo pipefail
+          cd dist
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            7z a -tzip "../Board-Game-Store-${{ matrix.label }}.zip" "Board Game Store" >/dev/null
+          else
+            tar -czf "../Board-Game-Store-${{ matrix.label }}.tar.gz" "Board Game Store"
+          fi
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: Board-Game-Store-${{ matrix.label }}
+          path: |
+            Board-Game-Store-${{ matrix.label }}.zip
+            Board-Game-Store-${{ matrix.label }}.tar.gz
+          if-no-files-found: error
