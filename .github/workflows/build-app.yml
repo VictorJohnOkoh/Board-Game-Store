@@ -32,10 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
@@ -53,7 +53,7 @@ jobs:
           -DoutputDirectory=target/runtime-libs
 
       - name: Upload jar and runtime libs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: app-jar
           path: |
@@ -72,24 +72,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # fxplatform is the classifier openjfx uses for its native-bearing jars.
+          # macos-latest runners are arm64, hence mac-aarch64 rather than mac.
           - os: windows-latest
             label: windows
+            fxplatform: win
           - os: ubuntu-latest
             label: linux
+            fxplatform: linux
           - os: macos-latest
             label: macos
+            fxplatform: mac-aarch64
     defaults:
       run:
         # Windows runners ship Git Bash, so one set of bash steps covers all three OSes.
         shell: bash
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # jep compiles a C extension against the JDK headers at pip-install time,
       # so JAVA_HOME must be set here, not just in the jar job.
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
@@ -98,7 +103,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
 
       - name: Download jar and runtime libs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: app-jar
           path: artifacts
@@ -152,11 +157,34 @@ jobs:
           test -f "${JEP_DIR}/java_import_hook.py" \
             || { echo "::error::jep python package incomplete"; exit 1; }
 
+      # JavaFX natives are platform-specific, exactly like jep's. -Djavafx.platform picks
+      # the classifier; resolving this on the runner rather than in the shared jar job is
+      # what makes each bundle carry the right binaries.
+      - name: Collect JavaFX for ${{ matrix.fxplatform }}
+        run: |
+          set -euo pipefail
+          mvn -B dependency:copy-dependencies \
+            -DincludeGroupIds=org.openjfx \
+            -Djavafx.platform=${{ matrix.fxplatform }} \
+            -DoutputDirectory="${PWD}/fxlibs"
+          ls -la fxlibs
+
       - name: Assemble bundle
         run: |
           set -euo pipefail
           BUNDLE="dist/Board Game Store"
-          mkdir -p "${BUNDLE}/lib" "${BUNDLE}/Scripts"
+          mkdir -p "${BUNDLE}/lib" "${BUNDLE}/Scripts" "${BUNDLE}/javafx"
+
+          # Only the classifier-bearing jars carry module-info and the native libraries;
+          # the unclassified ones are ~300-byte stubs. Copying both would put two jars
+          # declaring the same module on the module path.
+          set -- fxlibs/*-${{ matrix.fxplatform }}.jar
+          if [ "$#" -eq 0 ] || [ ! -f "$1" ]; then
+            echo "::error::no JavaFX jars for classifier ${{ matrix.fxplatform }}"
+            ls -la fxlibs || true
+            exit 1
+          fi
+          cp "$@" "${BUNDLE}/javafx/"
 
           # Fail loudly rather than silently picking the wrong jar if the build ever
           # starts emitting more than one (sources, javadoc, shaded, ...).
@@ -178,18 +206,25 @@ jobs:
           echo "=== bundle contents ==="
           ls -la "${BUNDLE}"
 
-      # Runs the shipped launcher itself, not an equivalent java command, so the test
-      # covers run.bat / run.sh and the environment they set. Feeding "0" selects Exit.
-      - name: Smoke test the bundle
+      # The launcher now starts the GUI, which needs a display, so the JEP/database chain
+      # is exercised headlessly through the CLI entry point that is still in the jar.
+      # This is the fragile part of the stack - embedded CPython, jep's native library,
+      # SQLite - and it must be covered on every platform.
+      - name: Smoke test JEP and database
         run: |
           set -uo pipefail
           BUNDLE="${PWD}/dist/Board Game Store"
           if [ "${RUNNER_OS}" = "Windows" ]; then
-            # cmd //c (double slash) stops Git Bash rewriting /c as a path.
-            OUT=$(echo 0 | cmd //c "$(cygpath -w "${BUNDLE}/Scripts/run.bat")" 2>&1) || true
+            B=$(cygpath -w "${BUNDLE}")
+            export PYTHONHOME="${B}\\python"
+            CP="${B}\\bgms.jar;${B}\\lib\\*"
           else
-            OUT=$(echo 0 | "${BUNDLE}/Scripts/run.sh" 2>&1) || true
+            export PYTHONHOME="${BUNDLE}/python"
+            CP="${BUNDLE}/bgms.jar:${BUNDLE}/lib/*"
           fi
+          # PYTHONHOME alone is enough: once LibraryLocator finds the jep package it
+          # preloads the CPython shared library itself.
+          OUT=$(echo 0 | java --enable-native-access=ALL-UNNAMED -cp "${CP}" CLIbasis.CLIbasis.Main 2>&1) || true
           echo "${OUT}"
           # The welcome menu only lists users if DatabaseManager.py ran and queried SQLite.
           if ! echo "${OUT}" | grep -q "PLEASE SELECT USER"; then
@@ -202,6 +237,31 @@ jobs:
           fi
           echo "Smoke test passed."
 
+      # Verifies the shipped launcher, the JavaFX module path and the FXML resource
+      # lookups - the exact things that were broken. Linux only, because it is the one
+      # runner where a virtual display is reliably available.
+      - name: Smoke test GUI startup (Linux)
+        if: matrix.label == 'linux'
+        run: |
+          set -uo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb
+          BUNDLE="${PWD}/dist/Board Game Store"
+          # The GUI has no exit condition, so staying alive IS the pass signal:
+          # timeout kills it and reports 124. Anything else means it died on its own.
+          timeout 25 xvfb-run -a "${BUNDLE}/Scripts/run.sh" > gui.log 2>&1
+          RC=$?
+          echo "--- gui output ---"
+          cat gui.log || true
+          if [ "${RC}" -ne 124 ]; then
+            echo "::error::GUI exited on its own (rc=${RC}); it should have stayed running"
+            exit 1
+          fi
+          if grep -q "Exception\|Caused by:" gui.log; then
+            echo "::error::GUI logged an exception during startup"
+            exit 1
+          fi
+          echo "GUI startup test passed (stayed running under xvfb)."
+
       - name: Archive bundle
         run: |
           set -euo pipefail
@@ -213,7 +273,7 @@ jobs:
           fi
 
       - name: Upload bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Board-Game-Store-${{ matrix.label }}
           path: |

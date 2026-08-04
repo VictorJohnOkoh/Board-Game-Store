@@ -11,9 +11,13 @@ rem they cannot be fixed from inside Java.
 set "PYTHONHOME=%APP_HOME%\python"
 set "PATH=%APP_HOME%\python;%PATH%"
 
+rem JavaFX ships as real modules with bundled natives, so it goes on the module path,
+rem not the classpath. These jars are platform-specific, like jep's native library.
 java --enable-native-access=ALL-UNNAMED ^
+  --module-path "%APP_HOME%\javafx" ^
+  --add-modules javafx.controls,javafx.fxml ^
   -cp "%APP_HOME%\bgms.jar;%APP_HOME%\lib\*" ^
-  CLIbasis.CLIbasis.Main %*
+  gui.app.MainApp %*
 
 endlocal
 pause

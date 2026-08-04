@@ -19,6 +19,10 @@ case "$(uname -s)" in
     ;;
 esac
 
+# JavaFX ships as real modules with bundled natives, so it goes on the module path,
+# not the classpath. These jars are platform-specific, like jep's native library.
 exec java --enable-native-access=ALL-UNNAMED \
+  --module-path "$APP_HOME/javafx" \
+  --add-modules javafx.controls,javafx.fxml \
   -cp "$APP_HOME/bgms.jar:$APP_HOME/lib/*" \
-  CLIbasis.CLIbasis.Main "$@"
+  gui.app.MainApp "$@"
