@@ -120,7 +120,7 @@ public class WelcomeController {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/controllers/" + getSceneFile(selectedUser.getRole()) + ".fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/controllers/" + getSceneFile(selectedUser.getRole()) + ".fxml"));
             Scene scene = new Scene(loader.load(), 800, 600);
             Stage stage = (Stage) userGrid.getScene().getWindow();
             stage.setScene(scene);
