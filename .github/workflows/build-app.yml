@@ -137,10 +137,18 @@ jobs:
           JEP_DIR=$("${PYEXE}" -c "import importlib.util, os; print(os.path.dirname(importlib.util.find_spec('jep').origin))")
           echo "jep package at ${JEP_DIR}"
           ls -la "${JEP_DIR}"
-          if ! ls "${JEP_DIR}"/jep.dll "${JEP_DIR}"/libjep.so "${JEP_DIR}"/libjep.dylib "${JEP_DIR}"/*.jnilib 2>/dev/null | head -1 | grep -q .; then
+          # Deliberately no pipeline here: `ls a b c` exits non-zero when ANY argument is
+          # missing, and this shell runs with pipefail, so `ls ... | grep` would report
+          # failure even when the library was found.
+          NATIVE_LIB=""
+          for cand in "${JEP_DIR}"/jep.dll "${JEP_DIR}"/libjep.so "${JEP_DIR}"/libjep.dylib "${JEP_DIR}"/*.jnilib; do
+            if [ -f "${cand}" ]; then NATIVE_LIB="${cand}"; break; fi
+          done
+          if [ -z "${NATIVE_LIB}" ]; then
             echo "::error::no jep native library found in ${JEP_DIR}"
             exit 1
           fi
+          echo "native library: ${NATIVE_LIB}"
           test -f "${JEP_DIR}/java_import_hook.py" \
             || { echo "::error::jep python package incomplete"; exit 1; }
 
@@ -152,13 +160,15 @@ jobs:
 
           # Fail loudly rather than silently picking the wrong jar if the build ever
           # starts emitting more than one (sources, javadoc, shaded, ...).
-          JAR_COUNT=$(ls artifacts/*.jar | wc -l)
-          if [ "${JAR_COUNT}" -ne 1 ]; then
-            echo "::error::expected exactly 1 application jar, found ${JAR_COUNT}"
-            ls -la artifacts/*.jar
+          # Positional params rather than `ls | wc -l`: no pipeline, so pipefail can't
+          # turn a successful lookup into a step failure.
+          set -- artifacts/*.jar
+          if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+            echo "::error::expected exactly 1 application jar, found $#"
+            ls -la artifacts/ || true
             exit 1
           fi
-          cp artifacts/*.jar "${BUNDLE}/bgms.jar"
+          cp "$1" "${BUNDLE}/bgms.jar"
           cp artifacts/runtime-libs/*.jar "${BUNDLE}/lib/"
           cp -r data "${BUNDLE}/data"
           cp packaging/run.bat packaging/run.sh "${BUNDLE}/Scripts/"
