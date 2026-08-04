@@ -21,7 +21,10 @@ esac
 
 # JavaFX ships as real modules with bundled natives, so it goes on the module path,
 # not the classpath. These jars are platform-specific, like jep's native library.
-exec java --enable-native-access=ALL-UNNAMED \
+# Native access is granted to two things: the unnamed module (jep, loaded from the
+# classpath) and javafx.graphics, which loads its own natives and is a named module,
+# so ALL-UNNAMED does not cover it.
+exec java --enable-native-access=ALL-UNNAMED,javafx.graphics \
   --module-path "$APP_HOME/javafx" \
   --add-modules javafx.controls,javafx.fxml \
   -cp "$APP_HOME/bgms.jar:$APP_HOME/lib/*" \

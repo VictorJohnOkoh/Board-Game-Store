@@ -53,7 +53,7 @@ jobs:
           -DoutputDirectory=target/runtime-libs
 
       - name: Upload jar and runtime libs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: app-jar
           path: |
@@ -100,10 +100,17 @@ jobs:
           distribution: 'temurin'
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v5
+        # No floating v9 tag is published, so this is pinned to an exact release.
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          # enable-cache defaults to "auto", which switches the uv package cache on and
+          # then warns that nothing matches **/uv.lock or **/requirements*.txt. uv is
+          # only used here to install a Python interpreter, never to resolve
+          # dependencies, so there is nothing worth caching.
+          enable-cache: false
 
       - name: Download jar and runtime libs
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: app-jar
           path: artifacts
@@ -276,7 +283,7 @@ jobs:
           fi
 
       - name: Upload bundle
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: Board-Game-Store-${{ matrix.label }}
           path: |
