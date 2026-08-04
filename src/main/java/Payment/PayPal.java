@@ -1,9 +1,9 @@
-package main.java.Payment;
+package Payment;
 
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import main.java.Users.Address;
+import Users.Address;
 
 
 public class PayPal implements PaymentMethod{

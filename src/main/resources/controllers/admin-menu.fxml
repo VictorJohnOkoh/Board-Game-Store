@@ -6,7 +6,7 @@
 
 <VBox alignment="TOP_CENTER" spacing="20.0" xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="main.java.gui.app.contollers.AdminMenuController"
+      fx:controller="gui.app.contollers.AdminMenuController"
       prefHeight="500.0" prefWidth="700.0" style="-fx-padding: 20;" stylesheets="@welcome-tray.css">
 
     <Label fx:id="welcomeLabel" text="" style="-fx-font-size: 18px; -fx-font-weight: bold;" />

@@ -1,13 +1,9 @@
-package main.java.Inventory;
+package Bridge;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.nio.file.Path;
 
-import jep.MainInterpreter;
+import Inventory.Accessory;
+import Inventory.BoardGame;
 import jep.SharedInterpreter;
 
 public class JavaPythonBridge {
@@ -18,6 +14,7 @@ public class JavaPythonBridge {
     public static final String ADD_BOARD_GAME     = "add_board_game";
     public static final String ADD_ACCESSORY      = "add_accessory";
     public static final String GET_ADMIN_PRODUCTS = "get_admin_products";
+    public static final String GET_ADMIN_PRODUCTS_RAW = "get_admin_products_raw";
     public static final String GET_PRODUCTS       = "get_products";
     public static final String CLOSE_CONNECTION   = "close_connection";
     public static final String GET_PRODUCT_BY_ID = "get_product_by_id";
@@ -26,135 +23,20 @@ public class JavaPythonBridge {
     public static final String FILTER_ID = "filter_product_id";
     public static final String FILTER_COMPATIBILITY = "filter_product_compatibility";
     public static final String ROLLBACK = "rollback";
-    
-// jep dll files for windows and Unix
-    private static final String winJepDll = "lib" + File.separator + "jep" + File.separator + "jep.dll";
-    private static final String unixJepDll = "lib" + File.separator + "jep" + File.separator + "libjep.so";
-    private static final String macJepDll = "lib" + File.separator + "jep" + File.separator + "libjep.jnilib";
-    private static final String jepDll = resolveOsVersion();
 
-    
-
-    static {
-        File dll = new File(jepDll);
-        MainInterpreter.setJepLibraryPath(dll.getAbsolutePath());
-
-    }
-    
-        
-    // global sharedInterpreter
+    // global sharedInterpreter.
+    // JEP locates its own native library via PYTHONHOME, which the launcher script sets - see
+    // Scripts/run.bat and Scripts/run.sh. Nothing here loads native libraries by hand.
     private final static SharedInterpreter interp = new SharedInterpreter();
-
     static {
-
-        String scriptPathToUse;
-
-        // Resolve the database path from the app location first, then fall back to the working directory.
-        File dbFile = resolveDatabaseFile();
-        String DB_PATH = dbFile.getAbsolutePath();
-
-        // Try to find the Python script in the source directory
-        java.io.File scriptFile = new java.io.File("Inventory" + File.separator + "DatabaseManager.py");
-        // temporary path for extracted Python script
-        String TEMP_SCRIPT_PATH;
-        if (scriptFile.exists()) {
-            scriptPathToUse = "src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py";
-        } else {
-            // Fallback: extract script from JAR resources to a temp file
-            try {
-                java.io.File tempScript = java.io.File.createTempFile("DatabaseManager", ".py");
-                java.io.InputStream scriptIn = JavaPythonBridge.class.getResourceAsStream("/main/resources/DatabaseManager.py");
-                if (scriptIn != null) {
-                    try (java.io.OutputStream scriptOut = new java.io.FileOutputStream(tempScript)) {
-                        byte[] buffer = new byte[8192];
-                        int bytesRead;
-                        while ((bytesRead = scriptIn.read(buffer)) != -1) {
-                            scriptOut.write(buffer, 0, bytesRead);
-                        }
-                    }
-                    scriptIn.close();
-                    TEMP_SCRIPT_PATH = tempScript.getAbsolutePath();
-                    scriptPathToUse = TEMP_SCRIPT_PATH;
-                } else {
-                    scriptPathToUse = "src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py";
-                }
-            } catch (Exception e) {
-                System.err.println("Error extracting Python script: " + e.getMessage());
-                scriptPathToUse = "src" + File.separator + "Inventory" + File.separator + "DatabaseManager.py";
-            }
-        }
-
         try {
-            interp.set("db_path", DB_PATH);
-            interp.runScript(scriptPathToUse);
-        } catch (Exception e) {
-            System.err.println("Error initializing SharedInterpreter: " + e.getMessage());
-        }
-    }
-
-    private static File resolveDatabaseFile() {
-        List<File> searchRoots = new ArrayList<>();
-
-        File codeLocation = getCodeLocation();
-        if (codeLocation != null) {
-            searchRoots.add(codeLocation);
-        }
-
-        File workingDir = new File(System.getProperty("user.dir"));
-        searchRoots.add(workingDir);
-        
-
-        for (File root : searchRoots) {
-            File resolved = findDatabaseFileFromRoot(root);
-            if (resolved != null) {
-                return resolved;
-            }
-        }
-
-        return new File(workingDir, "data" + File.separator + "StoreData.db");
-    }
-
-    private static File findDatabaseFileFromRoot(File startRoot) {
-        File current = startRoot;
-        for (int i = 0; i < 8 && current != null; i++) {
-            File candidate = new File(current, "data" + File.separator + "StoreData.db");
-            if (candidate.exists()) {
-                return candidate;
-            }
-
-            File nestedCandidate = new File(current, "Board Game Store" + File.separator + "data" + File.separator + "StoreData.db");
-            if (nestedCandidate.exists()) {
-                return nestedCandidate;
-            }
-
-            current = current.getParentFile();
-        }
-        return null;
-    }
-
-    private static File getCodeLocation() {
-        try {
-            File codeSource = new File(JavaPythonBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            if (codeSource.isFile()) {
-                return codeSource.getParentFile();
-            }
-            return codeSource;
-        } catch (URISyntaxException e) {
-            return null;
-        }
-    }
-
-/** Choose which dll to load based on the OS*/
-    private static String resolveOsVersion() {
-        String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-        if (osName.contains("windows")) {
-            return winJepDll;
-        } else if (osName.contains("linux")) {
-            return unixJepDll;
-        } else if (osName.contains("mac")) {
-            return macJepDll;
-        } else {
-            return "unknown";
+            Path scriptPath = PythonScriptLoader.tempCopy();
+            // JEP's runScript() does not define __file__, unlike `python script.py`, and
+            // DatabaseManager.py resolves the database relative to its own location.
+            interp.set("__file__", scriptPath.toString());
+            interp.runScript(scriptPath.toString());
+        } catch (RuntimeException e) {
+            System.out.println("Could not connect to the DBMS script: " + e.getMessage());
         }
     }
 

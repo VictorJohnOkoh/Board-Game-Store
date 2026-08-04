@@ -1,4 +1,4 @@
-package main.java.Inventory;
+package Inventory;
 
 public class BoardGame extends Product{
     final private int num_players;

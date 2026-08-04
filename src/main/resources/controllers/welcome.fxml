@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <VBox alignment="TOP_CENTER" spacing="15.0" xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="main.java.gui.app.contollers.WelcomeController"
+      fx:controller="gui.app.contollers.WelcomeController"
       prefHeight="500.0" prefWidth="700.0" style="-fx-padding: 20;">
 
     <Text text="Welcome to Board Game Store" style="-fx-font-size: 24px; -fx-font-weight: bold;" />

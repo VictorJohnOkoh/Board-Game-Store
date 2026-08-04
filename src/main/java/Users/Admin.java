@@ -1,10 +1,10 @@
-package main.java.Users;
+package Users;
 
-import main.java.CLIbasis.CLIbasis.ValidationUtils;
-import main.java.Inventory.Accessory;
-import main.java.Inventory.AccessoryType;
-import main.java.Inventory.BoardGame;
-import main.java.Inventory.JavaPythonBridge;
+import CLIbasis.CLIbasis.ValidationUtils;
+import Inventory.Accessory;
+import Inventory.AccessoryType;
+import Inventory.BoardGame;
+import Bridge.JavaPythonBridge;
 
 import java.util.Scanner;
 
@@ -60,7 +60,7 @@ public class Admin extends User{
 
       BoardGame product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
 //      User.stockClass.addStock(product);
-      JavaPythonBridge.run(JavaPythonBridge.ADD_BOARD_GAME, product);
+      JavaPythonBridge.run( JavaPythonBridge.ADD_BOARD_GAME, product);
 
     }
 

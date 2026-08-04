@@ -1,7 +1,7 @@
-package main.java.gui.app.contollers;
+package gui.app.contollers;
 
-import main.java.Users.User;
-import main.java.Inventory.JavaPythonBridge;
+import Users.User;
+import Bridge.JavaPythonBridge;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -27,7 +27,7 @@ public class AdminMenuController {
     @FXML
     private void handleViewProducts() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("view-products.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/controllers/admin-view-products.fxml"));
             Scene scene = new Scene(loader.load(), 800, 600);
             Stage stage = (Stage) welcomeLabel.getScene().getWindow();
             stage.setScene(scene);
@@ -43,7 +43,7 @@ public class AdminMenuController {
     @FXML
     private void handleAddProduct() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("add-product.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/controllers/add-product.fxml"));
             Scene scene = new Scene(loader.load(), 750, 600);
             Stage stage = (Stage) welcomeLabel.getScene().getWindow();
             stage.setScene(scene);

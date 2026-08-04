@@ -1,7 +1,7 @@
-package main.java.gui.app.contollers;
+package gui.app.contollers;
 
-import main.java.Users.User;
-import main.java.Inventory.JavaPythonBridge;
+import Users.User;
+import Bridge.JavaPythonBridge;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;

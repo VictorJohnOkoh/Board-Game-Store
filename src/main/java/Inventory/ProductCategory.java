@@ -1,4 +1,4 @@
-package main.java.Inventory;
+package Inventory;
 
 public enum ProductCategory {
     ACCESSORY,

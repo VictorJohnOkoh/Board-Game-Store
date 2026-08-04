@@ -8,12 +8,14 @@ _BACKUP_DIR : str  = ""
 _BACKUP_PATH : str = ""
 
 def init_paths():
-    """Initializes the database and backup paths"""
+    """Initializes the database and backup paths.
+    This script runs from a 'temp' folder placed as a sibling of 'data' by the Java bridge,
+    so the app's home directory is one level up from this file - regardless of the process's
+    working directory.
+    """
     global _DB_PATH, _BACKUP_DIR, _BACKUP_PATH
-    if 'db_path' in globals() and db_path:
-        _DB_PATH = globals()['db_path']         
-    else:
-        _DB_PATH = os.path.join(os.getcwd(), 'data', 'StoreData.db')
+    app_home = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    _DB_PATH = os.path.join(app_home, 'data', 'StoreData.db')
     script_dir = os.path.dirname(_DB_PATH)
     _BACKUP_DIR = os.path.join(script_dir, 'backups')
     _BACKUP_PATH = os.path.join(_BACKUP_DIR, 'StoreData_backup.db')

@@ -1,5 +1,5 @@
-package main.java.Payment;
-import main.java.Users.Address;
+package Payment;
+import Users.Address;
 
 public interface PaymentMethod {
 

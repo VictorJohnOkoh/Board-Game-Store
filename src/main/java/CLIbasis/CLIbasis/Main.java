@@ -1,9 +1,9 @@
-package main.java.CLIbasis.CLIbasis;
+package CLIbasis.CLIbasis;
 
-import main.java.Inventory.JavaPythonBridge;
-import main.java.Users.Admin;
-import main.java.Users.Customer;
-import main.java.Users.User;
+import Bridge.JavaPythonBridge;
+import Users.Admin;
+import Users.Customer;
+import Users.User;
 
 import java.util.List;
 import java.util.Scanner;

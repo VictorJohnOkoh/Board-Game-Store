@@ -1,7 +1,7 @@
-package main.java.gui.app.contollers;
+package gui.app.contollers;
 
-import main.java.Users.User;
-import main.java.Inventory.JavaPythonBridge;
+import Users.User;
+import Bridge.JavaPythonBridge;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -120,7 +120,7 @@ public class WelcomeController {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/views/" + getSceneFile(selectedUser.getRole()) + ".fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/controllers/" + getSceneFile(selectedUser.getRole()) + ".fxml"));
             Scene scene = new Scene(loader.load(), 800, 600);
             Stage stage = (Stage) userGrid.getScene().getWindow();
             stage.setScene(scene);

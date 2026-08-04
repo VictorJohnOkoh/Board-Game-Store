@@ -1,11 +1,11 @@
-package main.java.Users;
+package Users;
 
 import java.util.Scanner;
 
-import main.java.Payment.CreditCard;
-import main.java.Payment.PayPal;
-import main.java.Payment.Receipt;
-import main.java.Inventory.JavaPythonBridge;
+import Payment.CreditCard;
+import Payment.PayPal;
+import Payment.Receipt;
+import Bridge.JavaPythonBridge;
 
 
 public class Customer extends User{

@@ -1,8 +1,8 @@
-package main.java.Payment;
+package Payment;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import main.java.Users.Address;
+import Users.Address;
 
 
 public abstract class Receipt {

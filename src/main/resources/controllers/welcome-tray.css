@@ -100,6 +100,43 @@
     -fx-border-color: #4B7F52;
 }
 
+/* ---------- Product table ---------- */
+
+.user-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #C9C5BA;
+    -fx-border-width: 1;
+    -fx-table-cell-border-color: #E0DDD3;
+}
+
+.user-table .column-header-background {
+    -fx-background-color: #26261F;
+    -fx-background-radius: 4 4 0 0;
+}
+
+.user-table .column-header .label {
+    -fx-text-fill: #F7F6F2;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.user-table .table-row-cell {
+    -fx-background-color: #F7F6F2;
+    -fx-table-cell-border-color: #E0DDD3;
+}
+
+.user-table .table-row-cell:odd {
+    -fx-background-color: #EFECE4;
+}
+
+.user-table .table-row-cell:selected {
+    -fx-background-color: #2F6F63;
+}
+
+.user-table .table-row-cell:selected .text {
+    -fx-fill: #F7F6F2;
+}
+
 /* ---------- Footer ---------- */
 
 .footer-bar {

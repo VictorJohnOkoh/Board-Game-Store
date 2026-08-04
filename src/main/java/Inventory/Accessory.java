@@ -1,4 +1,4 @@
-package main.java.Inventory;
+package Inventory;
 
 public class Accessory extends Product{
     final private String compatibility;

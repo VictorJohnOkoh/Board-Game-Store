@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" spacing="15.0" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.app.controllers.ViewProductsController" stylesheets="@welcome-tray.css">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" spacing="15.0" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.app.contollers.ViewProductsController" stylesheets="@welcome-tray.css">
 
     <Text styleClass="title-text" text="All Products (Admin View)" />
 

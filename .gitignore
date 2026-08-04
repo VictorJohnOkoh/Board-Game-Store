@@ -37,3 +37,13 @@ bin/
 ### Mac OS ###
 .DS_Store
 /.metadata/
+
+### Build output ###
+# Local deployment bundle - assembled by CI (.github/workflows/build-app.yml).
+# Contains a ~73MB vendored CPython; must never be committed.
+/Board Game Store/
+/dist/
+target/
+
+### Local Python environment (WSL venv - not part of the build) ###
+/venv/

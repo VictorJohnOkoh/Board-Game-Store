@@ -1,6 +1,6 @@
-package main.java.CLIbasis.CLIbasis;
+package CLIbasis.CLIbasis;
 
-import main.java.Users.Admin;
+import Users.Admin;
 import java.util.Scanner;
 
 public class AdminCLI {

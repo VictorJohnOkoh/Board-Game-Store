@@ -1,0 +1,204 @@
+name: Build Cross-Platform Bundles
+
+# JEP embeds a *native* CPython interpreter, so there is no such thing as a single
+# cross-platform artifact: jep.dll / libjep.so / libjep.dylib each link against that
+# platform's libpython. The jar itself stays platform-neutral; the *bundle* around it
+# (jar + a vendored CPython 3.11 with jep installed + launcher) is platform-specific.
+#
+# See docs/research/jep-native-library-loading.md for why the previous approach
+# (extracting jep.dll into jar resources) could never work: the binaries alone are
+# useless without jep's Python package, and Windows will not resolve python311.dll
+# from the folder jep.dll was loaded from.
+
+on:
+  push:
+    # "GUI" is the active feature branch; drop it once this work merges to master.
+    branches: [ "main", "master", "GUI" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '25'
+  PYTHON_VERSION: '3.11'
+  JEP_VERSION: '4.3.1'
+
+jobs:
+  # -------------------------------------------------------------------
+  # STAGE 1: Build the platform-neutral application jar once.
+  # -------------------------------------------------------------------
+  build-jar:
+    name: Build application jar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build jar
+        run: mvn -B clean package -DskipTests
+
+      # Only jep is needed at runtime for the CLI bundle. JavaFX is a compile-time
+      # dependency here and is not required to launch CLIbasis.CLIbasis.Main.
+      - name: Collect runtime dependencies
+        run: >
+          mvn -B dependency:copy-dependencies
+          -DincludeArtifactIds=jep
+          -DoutputDirectory=target/runtime-libs
+
+      - name: Upload jar and runtime libs
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: |
+            target/*.jar
+            target/runtime-libs/
+          if-no-files-found: error
+
+  # -------------------------------------------------------------------
+  # STAGE 2: Assemble one self-contained bundle per platform.
+  # -------------------------------------------------------------------
+  bundle:
+    name: Bundle for ${{ matrix.label }}
+    needs: build-jar
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: windows
+          - os: ubuntu-latest
+            label: linux
+          - os: macos-latest
+            label: macos
+    defaults:
+      run:
+        # Windows runners ship Git Bash, so one set of bash steps covers all three OSes.
+        shell: bash
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # jep compiles a C extension against the JDK headers at pip-install time,
+      # so JAVA_HOME must be set here, not just in the jar job.
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Download jar and runtime libs
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: artifacts
+
+      # uv installs python-build-standalone builds, which are relocatable - an
+      # actions/setup-python interpreter is not, and would break once copied.
+      - name: Vendor CPython ${{ env.PYTHON_VERSION }}
+        run: |
+          set -euo pipefail
+          uv python install "${PYTHON_VERSION}" --install-dir "${PWD}/pyvendor"
+          # uv also creates an unversioned alias (a symlink/junction) next to the real
+          # directory. Globbing with a literal dot after the minor version selects only
+          # the real one: cpython-3.11.15-... matches, cpython-3.11-... does not.
+          PYROOT=$(ls -d "${PWD}"/pyvendor/cpython-${PYTHON_VERSION}.*/ | head -1)
+          echo "PYROOT=${PYROOT%/}" >> "$GITHUB_ENV"
+          echo "Vendored interpreter: ${PYROOT}"
+
+      - name: Install jep into the vendored interpreter
+        run: |
+          set -euo pipefail
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            PYEXE="${PYROOT}/python.exe"
+          else
+            PYEXE="${PYROOT}/bin/python3"
+          fi
+          # python-build-standalone marks itself PEP 668 externally-managed; that marker
+          # is meaningful for a tool-managed install but not for a private vendored copy.
+          find "${PYROOT}" -name EXTERNALLY-MANAGED -delete || true
+          "${PYEXE}" -m pip install --no-cache-dir "jep==${JEP_VERSION}"
+          "${PYEXE}" -c "import jep, os; print('jep package at', os.path.dirname(jep.__file__))"
+
+      - name: Assemble bundle
+        run: |
+          set -euo pipefail
+          BUNDLE="dist/Board Game Store"
+          mkdir -p "${BUNDLE}/lib" "${BUNDLE}/Scripts"
+
+          # Fail loudly rather than silently picking the wrong jar if the build ever
+          # starts emitting more than one (sources, javadoc, shaded, ...).
+          JAR_COUNT=$(ls artifacts/*.jar | wc -l)
+          if [ "${JAR_COUNT}" -ne 1 ]; then
+            echo "::error::expected exactly 1 application jar, found ${JAR_COUNT}"
+            ls -la artifacts/*.jar
+            exit 1
+          fi
+          cp artifacts/*.jar "${BUNDLE}/bgms.jar"
+          cp artifacts/runtime-libs/*.jar "${BUNDLE}/lib/"
+          cp -r data "${BUNDLE}/data"
+          cp packaging/run.bat packaging/run.sh "${BUNDLE}/Scripts/"
+          chmod +x "${BUNDLE}/Scripts/run.sh"
+          cp -r "${PYROOT}" "${BUNDLE}/python"
+
+          echo "=== bundle contents ==="
+          ls -la "${BUNDLE}"
+
+      # Proves the bundle actually starts a real interpreter and reads the database,
+      # rather than only proving that it was assembled.
+      - name: Smoke test the bundle
+        run: |
+          set -euo pipefail
+          BUNDLE="${PWD}/dist/Board Game Store"
+          export PYTHONHOME="${BUNDLE}/python"
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            export PATH="${BUNDLE}/python:${PATH}"
+            SEP=";"
+          else
+            export LD_LIBRARY_PATH="${BUNDLE}/python/lib:${LD_LIBRARY_PATH:-}"
+            export DYLD_LIBRARY_PATH="${BUNDLE}/python/lib:${DYLD_LIBRARY_PATH:-}"
+            SEP=":"
+          fi
+          OUT=$(echo 0 | java --enable-native-access=ALL-UNNAMED \
+            -cp "${BUNDLE}/bgms.jar${SEP}${BUNDLE}/lib/*" \
+            CLIbasis.CLIbasis.Main 2>&1) || true
+          echo "${OUT}"
+          # The welcome menu only lists users if DatabaseManager.py ran and queried SQLite.
+          if ! echo "${OUT}" | grep -q "PLEASE SELECT USER"; then
+            echo "::error::bundle failed to reach the user menu"
+            exit 1
+          fi
+          if echo "${OUT}" | grep -qi "can't find dependent libraries\|UnsatisfiedLinkError"; then
+            echo "::error::native library still unresolved"
+            exit 1
+          fi
+          echo "Smoke test passed."
+
+      - name: Archive bundle
+        run: |
+          set -euo pipefail
+          cd dist
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            7z a -tzip "../Board-Game-Store-${{ matrix.label }}.zip" "Board Game Store" >/dev/null
+          else
+            tar -czf "../Board-Game-Store-${{ matrix.label }}.tar.gz" "Board Game Store"
+          fi
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Board-Game-Store-${{ matrix.label }}
+          path: |
+            Board-Game-Store-${{ matrix.label }}.zip
+            Board-Game-Store-${{ matrix.label }}.tar.gz
+          if-no-files-found: error

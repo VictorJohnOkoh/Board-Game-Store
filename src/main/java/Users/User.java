@@ -1,6 +1,6 @@
-package main.java.Users;
+package Users;
 
-import main.java.Inventory.JavaPythonBridge;
+import Bridge.JavaPythonBridge;
 
 import java.util.ArrayList;
 import java.util.List;

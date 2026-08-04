@@ -1,4 +1,4 @@
-package main.java.CLIbasis.CLIbasis;
+package CLIbasis.CLIbasis;
 
 import java.util.Scanner;
 

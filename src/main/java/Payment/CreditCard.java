@@ -1,7 +1,7 @@
-package main.java.Payment;
+package Payment;
 
 import java.util.Scanner;
-import main.java.Users.Address;
+import Users.Address;
 
 public class CreditCard implements PaymentMethod{
     private int cardNumber;

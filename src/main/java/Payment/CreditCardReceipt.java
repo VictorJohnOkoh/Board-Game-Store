@@ -1,6 +1,6 @@
-package main.java.Payment;
+package Payment;
 
-import main.java.Users.Address;
+import Users.Address;
 
 public class CreditCardReceipt extends Receipt{
 

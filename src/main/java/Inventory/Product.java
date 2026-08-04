@@ -1,4 +1,4 @@
-package main.java.Inventory;
+package Inventory;
 
 import java.util.List;
 

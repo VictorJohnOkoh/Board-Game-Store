@@ -1,6 +1,6 @@
-package main.java.CLIbasis.CLIbasis;
+package CLIbasis.CLIbasis;
 
-import main.java.Users.Customer;
+import Users.Customer;
 import java.util.Scanner;
 
 public class CustomerCLI {

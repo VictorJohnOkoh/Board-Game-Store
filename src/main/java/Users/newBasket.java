@@ -1,9 +1,9 @@
-package main.java.Users;
+package Users;
 
-import main.java.Inventory.Accessory;
-import main.java.Inventory.BoardGame;
-import main.java.Inventory.JavaPythonBridge;
-import main.java.Inventory.Product;
+import Inventory.Accessory;
+import Inventory.BoardGame;
+import Bridge.JavaPythonBridge;
+import Inventory.Product;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package main.java.Users;
+package Users;
 
 public class Address {
     private final int house_num;
