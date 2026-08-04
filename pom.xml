@@ -2,12 +2,23 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.boardgame.store</groupId>
     <version>1.0-BETA</version>
-    <artifactId>GUI</artifactId>
+    <artifactId>bgms-GUI</artifactId>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
     </properties>
+    <!-- No <build> section: the jar-plugin defaults are what this project wants.
+         A Main-Class/Class-Path manifest was tried and removed because it did nothing.
+         `java -jar` cannot start this app regardless - JavaFX is a set of modules that
+         must be on the *module* path, so a bare `java -jar` fails with
+         NoClassDefFoundError: javafx/application/Application even with Main-Class set.
+         addClasspath made it worse: it wrote 15 bare jar names expected to sit beside
+         the jar, none of which exist in the shipped layout (jep lives in lib/, JavaFX in
+         javafx/), and had they resolved they would have put JavaFX on the classpath -
+         precisely the wrong path for a modular JavaFX app.
+         The supported entry points are Scripts/run.bat and Scripts/run.sh, which set the
+         module path explicitly. See .github/workflows/build-app.yml. -->
     <dependencies>
         <!--  JEP Java-Python bridge  -->
         <dependency>
@@ -39,6 +50,11 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
+            <version>25.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
             <version>25.0.2</version>
         </dependency>
     </dependencies>

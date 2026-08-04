@@ -8,6 +8,7 @@ module IntelliJ.GUI {
     exports gui.app to javafx.graphics;
     exports gui.app.contollers to javafx.fxml;
     exports Users;
+    exports Inventory;
 
 
     opens gui.app to javafx.graphics;
