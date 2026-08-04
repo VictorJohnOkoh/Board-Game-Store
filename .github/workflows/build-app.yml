@@ -163,6 +163,21 @@ jobs:
           test -f "${JEP_DIR}/java_import_hook.py" \
             || { echo "::error::jep python package incomplete"; exit 1; }
 
+          # jep is under the zlib/libpng licence, which requires the notice to be kept
+          # in distributions. pip puts it in <dist-info>/licenses (PEP 639). Derived from
+          # JEP_DIR rather than hard-coded, since site-packages sits at Lib/ on Windows
+          # and lib/python3.11/ elsewhere. Fails loudly: silently shipping without the
+          # licence is worse than a red build.
+          JEP_LICENSES="$(dirname "${JEP_DIR}")/jep-${JEP_VERSION}.dist-info/licenses"
+          if [ ! -d "${JEP_LICENSES}" ]; then
+            echo "::error::jep licence directory not found at ${JEP_LICENSES}"
+            ls -la "$(dirname "${JEP_DIR}")" || true
+            exit 1
+          fi
+          echo "licences: ${JEP_LICENSES}"
+          ls -la "${JEP_LICENSES}"
+          echo "JEP_LICENSES=${JEP_LICENSES}" >> "$GITHUB_ENV"
+
       # JavaFX natives are platform-specific, exactly like jep's. -Djavafx.platform picks
       # the classifier; resolving this on the runner rather than in the shared jar job is
       # what makes each bundle carry the right binaries.
@@ -209,8 +224,33 @@ jobs:
           chmod +x "${BUNDLE}/Scripts/run.sh"
           cp -r "${PYROOT}" "${BUNDLE}/python"
 
+          # Surface jep's licence at the top of the bundle. It already ships inside
+          # python/.../site-packages/jep-*.dist-info/licenses, but nobody would find it
+          # there, and a licence nobody can find does not satisfy the attribution the
+          # zlib/libpng terms ask for.
+          mkdir -p "${BUNDLE}/licenses/jep"
+          cp -r "${JEP_LICENSES}/." "${BUNDLE}/licenses/jep/"
+
+          # JavaFX ships under GPLv2 + Classpath Exception, but none of the openjfx jars
+          # or POMs carry the text, so it is vendored in the repo rather than extracted
+          # or downloaded. See packaging/licenses/javafx/PROVENANCE.md.
+          mkdir -p "${BUNDLE}/licenses/javafx"
+          cp packaging/licenses/javafx/LICENSE \
+             packaging/licenses/javafx/ADDITIONAL_LICENSE_INFO \
+             packaging/licenses/javafx/ASSEMBLY_EXCEPTION \
+             "${BUNDLE}/licenses/javafx/"
+
+          # CPython's own licence already sits at the root of the vendored interpreter;
+          # copy it up so every bundled component is represented in one place.
+          if [ -f "${BUNDLE}/python/LICENSE.txt" ]; then
+            mkdir -p "${BUNDLE}/licenses/python"
+            cp "${BUNDLE}/python/LICENSE.txt" "${BUNDLE}/licenses/python/LICENSE"
+          fi
+
           echo "=== bundle contents ==="
           ls -la "${BUNDLE}"
+          echo "=== licenses ==="
+          find "${BUNDLE}/licenses" -type f | sort
 
       # The launcher now starts the GUI, which needs a display, so the JEP/database chain
       # is exercised headlessly through the CLI entry point that is still in the jar.
