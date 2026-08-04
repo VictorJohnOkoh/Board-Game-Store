@@ -248,8 +248,11 @@ jobs:
           BUNDLE="${PWD}/dist/Board Game Store"
           # The GUI has no exit condition, so staying alive IS the pass signal:
           # timeout kills it and reports 124. Anything else means it died on its own.
-          timeout 25 xvfb-run -a "${BUNDLE}/Scripts/run.sh" > gui.log 2>&1
-          RC=$?
+          # `|| RC=$?` is required: GitHub starts this shell as `bash -e -o pipefail`,
+          # and `set -uo pipefail` above does NOT clear that -e, so an unguarded 124
+          # would abort the step before the exit code could even be inspected.
+          RC=0
+          timeout 25 xvfb-run -a "${BUNDLE}/Scripts/run.sh" > gui.log 2>&1 || RC=$?
           echo "--- gui output ---"
           cat gui.log || true
           if [ "${RC}" -ne 124 ]; then
