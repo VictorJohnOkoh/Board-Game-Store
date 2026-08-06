@@ -24,7 +24,6 @@ public class CustomerCLI {
                     case 2:
                         int productId = ValidationUtils.getPositiveInt(consoleInput, "Enter product ID: ");
                         customer.basket.addShopping(productId);
-                        System.out.println("Product added to basket successfully.\n");
                         break;
                         
                     // shows all contents of the customer's basket

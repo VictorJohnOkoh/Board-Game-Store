@@ -45,6 +45,7 @@ public class newBasket {
             return;
         }
         if (amount <= 0) {
+            System.out.println("The amount to add must be bigger than 0");
             return;
         }
 
@@ -52,10 +53,12 @@ public class newBasket {
         int newTotal = currentAmount + amount;
 
         if (newTotal > product.getQuantityInStock()) {
+            System.out.printf("There isn't enough of %s in stock to fulfill your order%n", product.getProductName());
             return;
         }
 
         items.put(product, newTotal);
+        System.out.println("Product added successfully\n");
     }
 
     /** Convenience overload that adds a single unit of the product. */
