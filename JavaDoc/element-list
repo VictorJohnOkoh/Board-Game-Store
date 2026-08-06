@@ -1,0 +1,8 @@
+module:IntelliJ.GUI
+Bridge
+CLIbasis.CLIbasis
+gui.app
+gui.app.controllers
+Inventory
+Payment
+Users

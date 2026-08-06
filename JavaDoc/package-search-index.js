@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"m":"IntelliJ.GUI","l":"Bridge"},{"m":"IntelliJ.GUI","l":"CLIbasis.CLIbasis"},{"m":"IntelliJ.GUI","l":"gui.app"},{"m":"IntelliJ.GUI","l":"gui.app.controllers"},{"m":"IntelliJ.GUI","l":"Inventory"},{"m":"IntelliJ.GUI","l":"Payment"},{"m":"IntelliJ.GUI","l":"Users"}];updateSearchResults();
