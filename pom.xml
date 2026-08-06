@@ -7,6 +7,10 @@
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
+        <!-- Sources contain non-ASCII characters (the £ sign), so the encoding must not
+             be left to whatever the build machine happens to default to. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     <dependencies>
         <!--  JEP Java-Python bridge  -->

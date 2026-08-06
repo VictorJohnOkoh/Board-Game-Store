@@ -311,6 +311,23 @@ jobs:
           fi
           echo "GUI startup test passed (stayed running under xvfb)."
 
+      # The smoke tests above run the app from inside the bundle, and the app extracts
+      # DatabaseManager.py to a 'temp' folder next to the jar. That folder is runtime
+      # state, not something a release should carry, so it is removed before archiving.
+      # The app also clears it on exit, but the smoke tests kill the GUI with `timeout`,
+      # which leaves no chance for the shutdown hook to run.
+      - name: Clean runtime state from bundle
+        run: |
+          set -euo pipefail
+          BUNDLE="dist/Board Game Store"
+          rm -rf "${BUNDLE}/temp"
+          echo "=== bundle contents after cleanup ==="
+          ls -la "${BUNDLE}"
+          if [ -e "${BUNDLE}/temp" ]; then
+            echo "::error::temp directory still present in the bundle"
+            exit 1
+          fi
+
       - name: Archive bundle
         run: |
           set -euo pipefail

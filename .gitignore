@@ -49,3 +49,6 @@ target/
 
 ### Temporary directories created by the program
 temp
+
+### Receipts written at checkout - customer records, not source
+/data/receipts/

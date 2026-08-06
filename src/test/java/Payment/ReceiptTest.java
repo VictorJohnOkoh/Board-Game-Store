@@ -42,11 +42,11 @@ class ReceiptTest {
 
         assertTrue(markdown.startsWith("# Receipt - "), "should open with a heading");
         assertTrue(markdown.contains("| Product | Qty | Total |"), "should contain a table header");
-        assertTrue(markdown.contains("| Catan | 2 | 69.98 |"), "line total should be price x quantity");
-        assertTrue(markdown.contains("| Ticket to Ride | 1 | 4.99 |"));
-        assertTrue(markdown.contains("**Total:** 74.97"));
-        assertTrue(markdown.contains("paid via PayPal using victor@gmail.com"),
-                "should include the payment method line");
+        assertTrue(markdown.contains("| Catan | 2 | £69.98 |"), "line total should be price x quantity");
+        assertTrue(markdown.contains("| Ticket to Ride | 1 | £4.99 |"));
+        // The grand total is carried by the payment line rather than a row of its own.
+        assertTrue(markdown.contains("£74.97 paid via PayPal using victor@gmail.com"),
+                "should include the payment method line and the amount paid");
     }
 
     @Test
@@ -71,7 +71,8 @@ class ReceiptTest {
         // Colons are illegal in Windows paths, so the time must not use them.
         assertTrue(saved.getFileName().toString().matches("\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}\\.md"),
                 "unexpected filename: " + saved.getFileName());
-        assertTrue(Files.readString(saved).contains("| Catan | 2 | 69.98 |"));
+        assertTrue(Files.readString(saved, java.nio.charset.StandardCharsets.UTF_8)
+                .contains("| Catan | 2 | £69.98 |"));
     }
 
     @Test
