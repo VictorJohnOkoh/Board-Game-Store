@@ -6,7 +6,8 @@
 <?import javafx.scene.text.*?>
 
 <?import javafx.collections.FXCollections?>
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="750.0" spacing="15.0" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.app.contollers.AddProductController" stylesheets="@welcome-tray.css">
+<?import java.lang.String?>
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="750.0" spacing="15.0" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/25.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.app.controllers.AddProductController" stylesheets="@welcome-tray.css">
 
     <Text styleClass="title-text" text="Add New Product" />
 
@@ -52,10 +53,10 @@
                     <Label GridPane.columnIndex="0" GridPane.rowIndex="1" text="Type:" />
                     <ChoiceBox fx:id="accTypeField" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="1">
                         <items>
-                            <FXCollections xmlns:fx="http://javafx.com/fxml/1">
-                                <String fx:value="miniature"></String>
-                                <String fx:value="dice"></String>
-                                <String fx:value="accessory kit"></String>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="miniature" />
+                                <String fx:value="dice" />
+                                <String fx:value="accessory kit" />
                             </FXCollections>
                         </items>
                     </ChoiceBox>
@@ -82,7 +83,7 @@
     </TabPane>
 
     <HBox alignment="CENTER_RIGHT" spacing="10.0">
-        <Label fx:id="statusLabel" text="" />
+        <Label fx:id="statusLabel" />
         <Button onAction="#handleBack" prefWidth="150" text="&lt; Back to Menu" styleClass="secondary-button" />
     </HBox>
 

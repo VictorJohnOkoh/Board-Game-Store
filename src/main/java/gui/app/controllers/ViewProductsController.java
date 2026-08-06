@@ -1,4 +1,4 @@
-package gui.app.contollers;
+package gui.app.controllers;
 
 import Bridge.JavaPythonBridge;
 import Users.User;

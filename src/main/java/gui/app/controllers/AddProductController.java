@@ -1,4 +1,4 @@
-package gui.app.contollers;
+package gui.app.controllers;
 
 import Inventory.Accessory;
 import Inventory.AccessoryType;
