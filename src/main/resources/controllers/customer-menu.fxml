@@ -14,13 +14,10 @@
     <Text text="Customer Menu" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
 
     <VBox alignment="CENTER" spacing="15.0">
-        <Button text="View All Products" prefWidth="250" styleClass="primary-button" />
-        <Button text="Add to Basket" prefWidth="250" styleClass="primary-button"/>
-        <Button text="View Basket" prefWidth="250" styleClass="primary-button"/>
-        <Button text="Purchase Items" prefWidth="250" styleClass="primary-button"/>
-        <Button text="Clear Basket" prefWidth="250" styleClass="primary-button"/>
-        <Button text="Search Products" prefWidth="250" styleClass="primary-button"/>
-        <Button text="Logout" onAction="#handleExit" prefWidth="250" styleClass="secondary-button"/>
+        <Button onAction="#handleViewProducts" text="View Products" prefWidth="250" styleClass="primary-button" />
+        <Button onAction="#handlePay" text="Pay" prefWidth="250" styleClass="primary-button"/>
+        <Button onAction="#handleClearBasket" text="Clear Basket" prefWidth="250" styleClass="secondary-button"/>
+        <Button onAction="#handleExit" text="Logout" prefWidth="250" styleClass="secondary-button"/>
     </VBox>
 
 </VBox>

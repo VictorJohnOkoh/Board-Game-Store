@@ -2,7 +2,6 @@ package Bridge;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -35,25 +34,11 @@ public class PythonScriptLoader {
      * from the IDE), i.e. a sibling of 'data'. */
     private static Path tempDir() {
         try {
-            Path dir = appHome().resolve("temp");
+            Path dir = AppPaths.appHome().resolve("temp");
             Files.createDirectories(dir);
             return dir;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /** The directory the app is running from: the jar's own directory when packaged, or the
-     * working directory when running unpacked classes from the IDE. */
-    private static Path appHome() {
-        try {
-            Path codeSource = Path.of(PythonScriptLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            if (Files.isRegularFile(codeSource)) {
-                return codeSource.getParent();
-            }
-        } catch (URISyntaxException ignored) {
-            // fall through to the working-directory default below
-        }
-        return Path.of(System.getProperty("user.dir"));
     }
 }

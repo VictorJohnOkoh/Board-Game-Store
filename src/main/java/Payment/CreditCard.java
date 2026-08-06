@@ -1,48 +1,38 @@
 package Payment;
 
-import java.util.Scanner;
 import Users.Address;
 
 public class CreditCard implements PaymentMethod{
-    private int cardNumber;
 
-    public CreditCard(Scanner consoleInput) {
-        boolean pass = false;
+    private static final int CARD_NUMBER_LENGTH = 6;
+    private static final int SECURITY_CODE_LENGTH = 3;
 
-        // loops as long as the card number doesn't pass verification
-        try {
-            while (!pass) {
-                System.out.print("Enter your 6 digit card number: ");
-                cardNumber = consoleInput.nextInt();
-                consoleInput.nextLine();
-                String test = String.format("%d", cardNumber).replaceAll("\\s+", "");
-                if (test.length() != 6) {
-                    System.out.println("Incorrect length.");
-                } else {
-                    pass = true;
-                }
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Only numerical characters allowed");
+    private final int cardNumber;
+    private final int securityCode;
+
+    /** Takes already-collected card details. Collecting them - from a console or from
+     * text fields - is the caller's job, so this class stays usable from both front-ends. */
+    public CreditCard(int cardNumber, int securityCode) {
+        this.cardNumber = cardNumber;
+        this.securityCode = securityCode;
+    }
+
+    /** True when the input is exactly {@value #CARD_NUMBER_LENGTH} digits. */
+    public static boolean isCardNumberValid(String input) {
+        return isDigitsOfLength(input, CARD_NUMBER_LENGTH);
+    }
+
+    /** True when the input is exactly {@value #SECURITY_CODE_LENGTH} digits. */
+    public static boolean isSecurityCodeValid(String input) {
+        return isDigitsOfLength(input, SECURITY_CODE_LENGTH);
+    }
+
+    private static boolean isDigitsOfLength(String input, int length) {
+        if (input == null) {
+            return false;
         }
-        // loops while the security number doesn't pass verification
-        pass = false;
-        try {
-            while (!pass) {
-                int securityNumber;
-                System.out.print("Enter your 3 digit security number: ");
-                securityNumber = consoleInput.nextInt();
-                consoleInput.nextLine();
-                String test = String.format("%d", securityNumber).replaceAll("\\s+", "");
-                if (test.length() != 3) {
-                    System.out.println("Incorrect length");
-                } else {
-                    pass = true;
-                }
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Only numerical characters allowed");
-        }
+        String trimmed = input.trim();
+        return trimmed.length() == length && trimmed.chars().allMatch(Character::isDigit);
     }
 
     public Receipt processPayment(double total, Address address){

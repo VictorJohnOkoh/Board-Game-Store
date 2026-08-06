@@ -1,6 +1,7 @@
 package CLIbasis.CLIbasis;
 
 import Users.Customer;
+import Users.newBasket;
 import java.util.Scanner;
 
 public class CustomerCLI {
@@ -23,7 +24,7 @@ public class CustomerCLI {
                     // add product to the basket using the product ID
                     case 2:
                         int productId = ValidationUtils.getPositiveInt(consoleInput, "Enter product ID: ");
-                        customer.basket.addShopping(productId);
+                        System.out.println(describeAddResult(customer.basket.addShopping(productId)));
                         break;
                         
                     // shows all contents of the customer's basket
@@ -71,6 +72,16 @@ public class CustomerCLI {
 
     }
     
+    /** Turns the basket's outcome into the message shown on the console. */
+    private static String describeAddResult(newBasket.AddResult result) {
+        return switch (result) {
+            case ADDED -> "Product added to basket successfully.\n";
+            case NOT_FOUND -> "No product with that ID exists.\n";
+            case INVALID_AMOUNT -> "The amount to add must be bigger than 0.\n";
+            case INSUFFICIENT_STOCK -> "There isn't enough of that product in stock to fulfil your order.\n";
+        };
+    }
+
     private static void printCustomerMenu() {
         System.out.println("PLEASE SELECT ACTION BY INPUTTING THE CORRESPONDING NUMBER (or 0 for logout)");
         System.out.println("1) View all products");

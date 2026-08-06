@@ -22,6 +22,11 @@ public class JavaPythonBridge {
     public static final String UPDATE_STOCK      = "update_stock";
     public static final String FILTER_ID = "filter_product_id";
     public static final String FILTER_COMPATIBILITY = "filter_product_compatibility";
+    // Customer-facing parseable variants. These omit pcost so the GUI can never
+    // display a purchase cost to a customer - see get_products_raw in the Python.
+    public static final String GET_PRODUCTS_RAW = "get_products_raw";
+    public static final String FILTER_ID_RAW = "filter_product_id_raw";
+    public static final String FILTER_COMPATIBILITY_RAW = "filter_product_compatibility_raw";
     public static final String ROLLBACK = "rollback";
 
     // global sharedInterpreter.

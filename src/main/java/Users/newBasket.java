@@ -17,6 +17,19 @@ import java.util.Map;
  */
 public class newBasket {
 
+    /**
+     * The outcome of an {@link #addShopping(int, int)} call, so callers can tell
+     * the customer why an add did not happen. Returning this instead of printing
+     * keeps the basket usable from both the CLI and the GUI - System.out messages
+     * are invisible in a JavaFX window.
+     */
+    public enum AddResult {
+        ADDED,
+        NOT_FOUND,
+        INVALID_AMOUNT,
+        INSUFFICIENT_STOCK
+    }
+
     // Preserves insertion order so the basket prints in the order items were added.
     private final Map<Product, Integer> items = new LinkedHashMap<>();
 
@@ -30,40 +43,43 @@ public class newBasket {
      * <p>
      * If the resulting total quantity for that product exceeds the
      * product's {@code quantityInStock}, the whole operation is cancelled
-     * (the basket is left unchanged), and a message is printed to the CLI.
+     * and the basket is left unchanged.
      *
      * @param pid the ID for the product to add
      * @param amount  how many units to add
+     * @return what happened, so the caller can report it to the user
      */
-    public void addShopping(int pid, int amount) {
-        Product product;
+    public AddResult addShopping(int pid, int amount) {
         String productData = JavaPythonBridge.run_result(JavaPythonBridge.GET_PRODUCT_BY_ID, pid);
-        assert productData != null;
-        if (!productData.equals("NOT_FOUND")){
-            product = Product.buildProduct(productData);
-        } else {
-            return;
+        if (productData == null || productData.equals("NOT_FOUND")) {
+            return AddResult.NOT_FOUND;
         }
+        return addShopping(Product.buildProduct(productData), amount);
+    }
+
+    /**
+     * The basket rules, once the product has been looked up. Kept separate from the
+     * database lookup above so the quantity and stock rules can be exercised directly.
+     */
+    AddResult addShopping(Product product, int amount) {
         if (amount <= 0) {
-            System.out.println("The amount to add must be bigger than 0");
-            return;
+            return AddResult.INVALID_AMOUNT;
         }
 
         int currentAmount = items.getOrDefault(product, 0);
         int newTotal = currentAmount + amount;
 
         if (newTotal > product.getQuantityInStock()) {
-            System.out.printf("There isn't enough of %s in stock to fulfill your order%n", product.getProductName());
-            return;
+            return AddResult.INSUFFICIENT_STOCK;
         }
 
         items.put(product, newTotal);
-        System.out.println("Product added successfully\n");
+        return AddResult.ADDED;
     }
 
     /** Convenience overload that adds a single unit of the product. */
-    public void addShopping(int pid) {
-        addShopping(pid, 1);
+    public AddResult addShopping(int pid) {
+        return addShopping(pid, 1);
     }
 
     /**
@@ -149,13 +165,10 @@ public class newBasket {
     public String getProductAmount(){
         StringBuilder contents = new StringBuilder();
         for (Map.Entry<Product, Integer> entry : items.entrySet()) {
-            int pid = entry.getKey().getProductID();
-            int amount = entry.getValue();
-            String newProduct = pid + ":" + amount;
-            if (items.entrySet().iterator().hasNext()){
-                newProduct += ";";
+            if (!contents.isEmpty()) {
+                contents.append(';');
             }
-            contents.append(newProduct);
+            contents.append(entry.getKey().getProductID()).append(':').append(entry.getValue());
         }
         return contents.toString();
     }

@@ -177,6 +177,42 @@ def filter_product_id(search: int):
     return result
 
 
+def get_products_raw():
+    """Returns all products in a parseable semicolon-delimited format for customers.
+    Each line: pid;category;type;name;price;quantity;extra
+    Category is 'boardgame' or 'accessory'.
+    Extra field is noplayers for board games, compatibility for accessories.
+    Unlike get_admin_products_raw this deliberately omits pcost - customers
+    must never see the purchase cost.
+    """
+    query = "SELECT BoardGame.id, 'boardgame', genre, name, price, quantity, noplayers FROM main.BoardGame LEFT JOIN main.BoardGamePlayers ON BoardGame.id = BoardGamePlayers.id UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, compatibility FROM Accessory LEFT JOIN AccessoryCompatibility AC on Accessory.id = AC.id ORDER BY price DESC"
+    cursor.execute(query)
+    return _format_customer_rows(cursor.fetchall())
+
+
+def filter_product_id_raw(search: int):
+    """Filters products by ID, returning the customer-safe parseable format."""
+    query = "SELECT BoardGame.id, 'boardgame', genre, name, price, quantity, noplayers FROM main.BoardGame LEFT JOIN main.BoardGamePlayers BGP on BoardGame.id = BGP.id WHERE BoardGame.id LIKE ? UNION SELECT Accessory.id, 'accessory', type, name, price, quantity, compatibility FROM main.Accessory LEFT JOIN main.AccessoryCompatibility AC on Accessory.id = AC.id WHERE Accessory.id LIKE ?"
+    cursor.execute(query, (f"%{search}%", f"%{search}%",))
+    return _format_customer_rows(cursor.fetchall())
+
+
+def filter_product_compatibility_raw(search: str):
+    """Filters accessories by compatibility, returning the customer-safe parseable format."""
+    query = "SELECT Accessory.id, 'accessory', type, name, price, quantity, compatibility FROM main.Accessory LEFT JOIN AccessoryCompatibility ON Accessory.id = AccessoryCompatibility.id WHERE compatibility LIKE ?;"
+    cursor.execute(query, (f"%{search}%",))
+    return _format_customer_rows(cursor.fetchall())
+
+
+def _format_customer_rows(rows):
+    """Renders query rows as 'pid;category;type;name;price;quantity;extra' lines."""
+    result = ""
+    for row in rows:
+        result += f"{row[0]};{row[1]};{row[2]};{row[3]};{row[4]:.2f};{row[5]};{row[6]}\n"
+
+    return result
+
+
 def update_stock(basket_data: str):
     """Updates stock for multiple products from a basket string.
     To be used after a basket has been paid for
