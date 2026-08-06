@@ -7,11 +7,10 @@
 <VBox alignment="TOP_CENTER" spacing="20.0" xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="gui.app.controllers.AdminMenuController"
-      prefHeight="500.0" prefWidth="700.0" style="-fx-padding: 20;" stylesheets="@welcome-tray.css">
+      prefHeight="500.0" prefWidth="700.0" style="-fx-padding: 20;" stylesheets="@theme-walnut.css">
 
-    <Label fx:id="welcomeLabel" text="" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+    <Label fx:id="welcomeLabel" styleClass="title-text" />
 
-    <Text styleClass="title-text" text="Admin Menu" />
 
     <VBox alignment="CENTER" spacing="15.0">
         <Button onAction="#handleViewProducts" text="View All Products" prefWidth="250" styleClass="primary-button" />

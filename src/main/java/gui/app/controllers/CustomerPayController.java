@@ -49,6 +49,9 @@ public class CustomerPayController {
         amountColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().amount())));
         lineTotalColumn.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.2f", data.getValue().lineTotal())));
 
+        // Without this the amount and total columns sort as text: 10 before 2.
+        TableColumns.sortNumerically(amountColumn, lineTotalColumn);
+
         addRemoveButtonColumn();
         refresh();
     }

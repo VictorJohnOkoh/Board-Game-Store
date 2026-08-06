@@ -1,0 +1,422 @@
+/* ==========================================================
+   Board Game Store — theme: Walnut
+   Walnut furniture under card-room light. Rather than average
+   the two palettes into mud, each keeps a role: the deepest
+   surfaces take the card room's plum, the broad surfaces stay
+   timber, and brass is the thread running through both.
+   ========================================================== */
+
+.root {
+    /* --- palette ------------------------------------------------
+       key    the deepest value: table headers, primary buttons.
+              Plum-black, borrowed from the card room.
+       raised sits BELOW the background, not above it, so input
+              wells read as recessed. Also the bridge between the
+              plum below and the timber above.
+       hover  buttons only. The plum warmed toward ember, so a
+              highlighted button reads as lit rather than just
+              lighter. Buttons own this instead of sharing raised,
+              which would tint every text field too.
+       base   the app background (gradient runs base -> deep). Kept
+              well clear of key so headers and buttons stand off it.
+       row    table rows, a shade above the background
+       select plum-tinted, so selection ties back to the key colour
+       ---------------------------------------------------------- */
+    -color-key:     #1E1024;
+    -color-raised:  #33202E;
+    -color-hover: #8E2439;
+    -color-base:    #5C4130;
+    -color-deep:    #4C3527;
+    -color-row:     #664936;
+    -color-row-alt: #6F513C;
+    -color-select:  #7C556B;
+    -color-line:    #8A6749;
+    -color-accent:  #DFAE52;
+    -color-text:    #FAF3EA;
+    -color-muted:   #E2CFBB;
+    -color-admin:   #EE9A94;
+    -color-customer:#B4D296;
+    -color-danger:  #FF9A94;
+
+    -fx-background-color: linear-gradient(to bottom, -color-base, -color-deep);
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-padding: 26 30 22 30;
+}
+
+/* Plain labels default to black in JavaFX, which is unreadable here. */
+.label {
+    -fx-text-fill: -color-text;
+}
+
+/* ---------- Header ---------- */
+
+.kicker-text {
+    -fx-fill: -color-accent;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* A serif display face for the shopfront feel; body stays a sans. */
+.title-text {
+    -fx-fill: -color-text;
+    -fx-font-family: "Georgia", "Constantia", serif;
+    -fx-font-size: 29px;
+    -fx-font-weight: bold;
+}
+
+.rule-line .line {
+    -fx-border-color: -color-line;
+    -fx-border-width: 1.5 0 0 0;
+}
+
+.step-label {
+    -fx-fill: -color-muted;
+    -fx-font-size: 13px;
+}
+
+/* ---------- User grid ---------- */
+
+.user-grid {
+    -fx-padding: 10 0 10 0;
+}
+
+.user-component {
+    -fx-cursor: hand;
+}
+
+.icon-token {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 2);
+    -fx-stroke: transparent;
+    -fx-stroke-width: 3;
+}
+
+.user-component.selected .icon-token {
+    -fx-stroke: -color-accent;
+}
+
+.user-component.selected .name-label {
+    -fx-text-fill: -color-accent;
+}
+
+.initials-label {
+    -fx-text-fill: -color-text;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* The line is drawn as a 1px left border, so the region has to be held at
+   1px wide. Its parent VBox fills children to the tile width by default,
+   which would stretch this and leave the line hard against the left edge
+   instead of centred under the token. Capping the max width stops the
+   stretch; the VBox's CENTER alignment then does the centring. */
+.leader-line {
+    -fx-pref-width: 1;
+    -fx-min-width: 1;
+    -fx-max-width: 1;
+    -fx-pref-height: 14;
+    -fx-border-color: -color-line;
+    -fx-border-width: 0 0 0 1;
+    -fx-border-style: dashed;
+}
+
+.name-label {
+    -fx-text-fill: -color-text;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.stamp-badge {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-width: 1.4;
+    -fx-rotate: -3;
+}
+
+.role-admin {
+    -fx-text-fill: -color-admin;
+    -fx-border-color: -color-admin;
+}
+
+.role-customer {
+    -fx-text-fill: -color-customer;
+    -fx-border-color: -color-customer;
+}
+
+/* ---------- Product table ---------- */
+
+/* The container carries the fill and the rounded corners. Rows are left
+   transparent so this shows through at the corners - a row with its own
+   opaque background paints a square rectangle over them. */
+.user-table {
+    -fx-background-color: -color-row;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-line;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* The brass hairline is the signature: it also does the job of
+   separating the header from the first row. */
+.user-table .column-header-background {
+    -fx-background-color: -color-key;
+    -fx-background-radius: 9 9 0 0;
+    -fx-border-color: transparent transparent -color-accent transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* Modena paints each header on top of the background above with its
+   own light gradient. Without this the dark colour never shows and the
+   white header text becomes unreadable. No divider on the right: the
+   header labels are separated by space, not rules. */
+.user-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 10 10 10 10;
+}
+
+.user-table .column-header-background .filler,
+.user-table .corner {
+    -fx-background-color: -color-key;
+}
+
+.user-table .column-header .label {
+    -fx-text-fill: -color-text;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+/* One tone rather than stripes, separated by a hairline along the bottom.
+   Rows stay transparent so the container's rounded corners survive. */
+.user-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -color-row-alt transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-cell-size: 34px;
+}
+
+.user-table .table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* No vertical rules between the cells of a row. */
+.user-table .table-cell {
+    -fx-text-fill: -color-text;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 4 10 4 10;
+}
+
+.user-table .table-row-cell:hover {
+    -fx-background-color: -color-row-alt;
+}
+
+.user-table .table-row-cell:selected {
+    -fx-background-color: -color-select;
+}
+
+.user-table .table-row-cell:selected .text,
+.user-table .table-row-cell:selected .table-cell {
+    -fx-fill: -color-text;
+    -fx-text-fill: -color-text;
+}
+
+.user-table .placeholder .label {
+    -fx-text-fill: -color-muted;
+}
+
+/* ---------- Inputs ---------- */
+
+.text-field {
+    -fx-background-color: -color-raised;
+    -fx-text-fill: -color-text;
+    -fx-prompt-text-fill: -color-muted;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: -color-line;
+    -fx-border-width: 1;
+    -fx-padding: 7 10 7 10;
+}
+
+.text-field:focused {
+    -fx-border-color: -color-accent;
+}
+
+.radio-button, .check-box {
+    -fx-text-fill: -color-text;
+}
+
+.radio-button .radio, .check-box .box {
+    -fx-background-color: -color-raised;
+    -fx-border-color: -color-line;
+}
+
+.radio-button:selected .dot {
+    -fx-background-color: -color-accent;
+}
+
+.choice-box {
+    -fx-background-color: -color-raised;
+    -fx-border-color: -color-line;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.choice-box .label {
+    -fx-text-fill: -color-text;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: -color-deep;
+}
+
+.tab-pane .tab {
+    -fx-background-color: -color-raised;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: -color-key;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: -color-muted;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: -color-text;
+}
+
+.scroll-bar {
+    -fx-background-color: -color-deep;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -color-line;
+    -fx-background-radius: 6;
+}
+
+/* ---------- Footer and buttons ---------- */
+
+.footer-bar {
+    -fx-border-color: -color-line transparent transparent transparent;
+    -fx-border-width: 1.5 0 0 0;
+    -fx-padding: 16 0 0 0;
+}
+
+/* Carries running totals, so it is set in a face with even figures. */
+.hint-text {
+    -fx-text-fill: -color-muted;
+    -fx-font-family: "Consolas", "Cascadia Mono", monospace;
+    -fx-font-size: 11.5px;
+}
+
+.error-text {
+    -fx-text-fill: -color-danger;
+    -fx-font-size: 11.5px;
+}
+
+/* The background is inset by exactly the border width, and its radius
+   reduced to match (8 - 1.5). JavaFX fills the background across the
+   node's full bounds and paints the border stroke over the top, so
+   without this the fill shows past the stroke at the rounded corners. */
+.primary-button {
+    -fx-background-color: -color-key;
+    -fx-background-insets: 1.5;
+    -fx-background-radius: 6.5;
+    -fx-text-fill: -color-text;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-border-radius: 8;
+    -fx-border-color: -color-accent;
+    -fx-border-width: 1.5;
+    -fx-padding: 9 20 9 20;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: -color-hover;
+}
+
+/* Pressed goes below the resting colour, keeping the plum family. */
+.primary-button:pressed,
+.primary-button:armed {
+    -fx-background-color: #150A14;
+}
+
+.primary-button:disabled {
+    -fx-opacity: 0.45;
+}
+
+/* Rests transparent so nothing can leak, but the hover and pressed
+   fills would, hence the same inset treatment as the primary. */
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 1.5;
+    -fx-background-radius: 6.5;
+    -fx-text-fill: -color-muted;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-border-radius: 8;
+    -fx-border-color: -color-line;
+    -fx-border-width: 1.5;
+    -fx-padding: 9 20 9 20;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: -color-hover;
+    -fx-text-fill: -color-text;
+}
+
+.secondary-button:pressed,
+.secondary-button:armed {
+    -fx-background-color: -color-key;
+}
+
+.secondary-button:disabled {
+    -fx-opacity: 0.45;
+}
+
+/* ---------- Dialogs ----------
+   Alerts open in their own Scene, so these rules only apply once the
+   stylesheet is added to the dialog pane in Java. */
+
+.dialog-pane {
+    -fx-background-color: -color-base;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: -color-key;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: -color-text;
+    -fx-font-size: 15px;
+}
+
+.dialog-pane .content.label,
+.dialog-pane .label {
+    -fx-text-fill: -color-text;
+}
+
+.dialog-pane .button {
+    -fx-background-color: -color-key;
+    -fx-text-fill: -color-text;
+    -fx-border-color: -color-accent;
+    -fx-border-width: 1.2;
+    -fx-background-insets: 1.2;
+    -fx-background-radius: 4.8;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: -color-raised;
+}

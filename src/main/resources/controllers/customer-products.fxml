@@ -6,7 +6,7 @@
 
 <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" spacing="12.0" style="-fx-padding: 20;"
       xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="gui.app.controllers.CustomerProductsController" stylesheets="@welcome-tray.css">
+      fx:controller="gui.app.controllers.CustomerProductsController" stylesheets="@theme-walnut.css">
 
     <Text styleClass="title-text" text="Products" />
 

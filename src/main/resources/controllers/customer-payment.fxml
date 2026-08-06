@@ -7,7 +7,7 @@
 
 <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="700.0" spacing="18.0" style="-fx-padding: 25;"
       xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="gui.app.controllers.CustomerPaymentController" stylesheets="@welcome-tray.css">
+      fx:controller="gui.app.controllers.CustomerPaymentController" stylesheets="@theme-walnut.css">
 
     <Text fx:id="titleText" styleClass="title-text" text="Payment" />
 

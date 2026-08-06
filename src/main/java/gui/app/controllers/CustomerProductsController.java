@@ -59,6 +59,9 @@ public class CustomerProductsController {
         priceColumn.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.2f", data.getValue().price())));
         stockColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().stock())));
 
+        // Without this the ID, price and stock columns sort as text: 10 before 2.
+        TableColumns.sortNumerically(idColumn, priceColumn, stockColumn);
+
         addAddButtonColumn();
         addDoubleClickToAdd();
 

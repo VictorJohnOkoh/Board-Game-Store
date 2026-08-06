@@ -7,7 +7,7 @@
 
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
-<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="750.0" spacing="15.0" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/25.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.app.controllers.AddProductController" stylesheets="@welcome-tray.css">
+<VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="750.0" spacing="15.0" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/25.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.app.controllers.AddProductController" stylesheets="@theme-walnut.css">
 
     <Text styleClass="title-text" text="Add New Product" />
 

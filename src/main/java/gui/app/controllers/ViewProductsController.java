@@ -42,7 +42,11 @@ public class ViewProductsController {
         // costColumn only exists in the admin view's FXML - the customer view doesn't inject it
         if (costColumn != null) {
             costColumn.setCellValueFactory(data -> new SimpleStringProperty(String.format("%.2f", data.getValue().cost())));
+            TableColumns.sortNumerically(costColumn);
         }
+
+        // Without this the ID, price and stock columns sort as text: 10 before 2.
+        TableColumns.sortNumerically(idColumn, priceColumn, stockColumn);
 
         loadProducts();
     }
