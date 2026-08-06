@@ -21,7 +21,7 @@
                     <TextField fx:id="bgIdField" promptText="4-digit numeric ID" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200" />
 
                     <Label GridPane.columnIndex="0" GridPane.rowIndex="1" text="Genre/Type:" />
-                    <TextField fx:id="bgTypeField" promptText="e.g., strategy, card, party" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200" />
+                    <TextField fx:id="bgTypeField" promptText="e.g., strategy, party, etc" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="200" />
 
                     <Label GridPane.columnIndex="0" GridPane.rowIndex="2" text="Name:" />
                     <TextField fx:id="bgNameField" promptText="Game name" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="200" />

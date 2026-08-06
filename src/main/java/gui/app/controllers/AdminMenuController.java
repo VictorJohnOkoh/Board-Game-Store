@@ -75,11 +75,16 @@ public class AdminMenuController {
 
     @FXML
     private void handleExit() {
-        Stage stage = (Stage) welcomeLabel.getScene().getWindow();
-        stage.close();
-        if (currentUser != null) {
-            JavaPythonBridge.run(JavaPythonBridge.CLOSE_CONNECTION);
-            JavaPythonBridge.close();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/controllers/welcome-tray.fxml"));
+            Scene scene = new Scene(loader.load(), 700, 500);
+            Stage stage = (Stage) welcomeLabel.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+
+
+        } catch (IOException e){
+            showAlert("Logout error","Could not return to the welcome screen: " + e.getMessage());
         }
     }
 
