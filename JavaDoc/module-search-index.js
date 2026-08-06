@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"IntelliJ.GUI"}];updateSearchResults();
