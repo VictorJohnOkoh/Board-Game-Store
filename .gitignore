@@ -47,3 +47,6 @@ target/
 
 ### Local Python environment (WSL venv - not part of the build) ###
 /venv/
+
+### Temporary directories created by the program
+temp
