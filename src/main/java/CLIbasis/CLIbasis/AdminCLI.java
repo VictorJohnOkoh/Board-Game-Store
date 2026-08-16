@@ -10,7 +10,7 @@ public class AdminCLI {
         while (true) {
         	printAdminMenu();
 
-            int selection = ValidationUtils.getChoice(consoleInput, "Enter your choice: ", 0, 2);
+            int selection = ValidationUtils.getChoice(consoleInput, "Enter your choice: ", 0, 3);
             
             try {
                 switch (selection) {
@@ -37,8 +37,8 @@ public class AdminCLI {
                         }
                         break;
                     case 3:
-                        admin.rollbackDatabase();
-                        System.out.println("Database rolled back to last backup.");    
+                        System.out.println(describeRollback(Admin.rollbackDatabase()));
+                        break;
                     case 0:
                         return;
                 }
@@ -54,7 +54,18 @@ public class AdminCLI {
         return switch (result) {
             case ADDED -> "Product added successfully.\n";
             case DUPLICATE_ID -> "A product with that ID already exists. Nothing was added.\n";
+            case DUPLICATE_NAME -> "A product with that name already exists. Nothing was added.\n";
+            case DUPLICATE_BOTH -> "A product with that ID, and a product with that name, already exist. Nothing was added.\n";
             case FAILED -> "The product could not be added. Please try again.\n";
+        };
+    }
+
+    /** Turns the outcome of a rollback into the message shown on the console. */
+    private static String describeRollback(Admin.RollbackResult result) {
+        return switch (result) {
+            case RESTORED -> "Database rolled back to the last backup.\n";
+            case NO_BACKUP -> "There is no backup to roll back to.\n";
+            case FAILED -> "The database could not be rolled back.\n";
         };
     }
 

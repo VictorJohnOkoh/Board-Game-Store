@@ -20,6 +20,18 @@ public class Admin extends User{
     public enum AddResult {
         ADDED,
         DUPLICATE_ID,
+        DUPLICATE_NAME,
+        DUPLICATE_BOTH,
+        FAILED
+    }
+
+    /**
+     * The outcome of rolling the database back, for the same reason as {@link AddResult}:
+     * the interface has to be able to tell a restore that happened from one that did not.
+     */
+    public enum RollbackResult {
+        RESTORED,
+        NO_BACKUP,
         FAILED
     }
 
@@ -33,7 +45,7 @@ public class Admin extends User{
      * @return what happened, so the caller can report it to the admin
      */
     public static AddResult addProduct(BoardGame game) {
-        return interpret(JavaPythonBridge.run_result(JavaPythonBridge.ADD_BOARD_GAME, game));
+        return interpretAdd(JavaPythonBridge.run_result(JavaPythonBridge.ADD_BOARD_GAME, game));
     }
 
     /**
@@ -42,7 +54,16 @@ public class Admin extends User{
      * @return what happened, so the caller can report it to the admin
      */
     public static AddResult addProduct(Accessory accessory) {
-        return interpret(JavaPythonBridge.run_result(JavaPythonBridge.ADD_ACCESSORY, accessory));
+        return interpretAdd(JavaPythonBridge.run_result(JavaPythonBridge.ADD_ACCESSORY, accessory));
+    }
+
+    /**
+     * Restores the database from the last backup.
+     *
+     * @return what happened, so the caller can report it to the admin
+     */
+    public static RollbackResult rollbackDatabase() {
+        return interpretRollback(JavaPythonBridge.run_result(JavaPythonBridge.ROLLBACK));
     }
 
     /**
@@ -52,14 +73,28 @@ public class Admin extends User{
      * Kept separate from the calls above, and visible to the package, so the mapping can be
      * exercised without a database - the interface reads this to decide what to tell the admin.
      */
-    static AddResult interpret(String pythonResult) {
+    static AddResult interpretAdd(String pythonResult) {
         if (pythonResult == null) {
             return AddResult.FAILED;
         }
         return switch (pythonResult) {
             case "ADDED" -> AddResult.ADDED;
             case "DUPLICATE_ID" -> AddResult.DUPLICATE_ID;
+            case "DUPLICATE_NAME" -> AddResult.DUPLICATE_NAME;
+            case "DUPLICATE_BOTH" -> AddResult.DUPLICATE_BOTH;
             default -> AddResult.FAILED;
+        };
+    }
+
+    /** Turns the status token from the Python rollback into a result. See {@link #interpretAdd}. */
+    static RollbackResult interpretRollback(String pythonResult) {
+        if (pythonResult == null) {
+            return RollbackResult.FAILED;
+        }
+        return switch (pythonResult) {
+            case "ROLLED_BACK" -> RollbackResult.RESTORED;
+            case "NO_BACKUP" -> RollbackResult.NO_BACKUP;
+            default -> RollbackResult.FAILED;
         };
     }
 
@@ -178,12 +213,6 @@ public class Admin extends User{
      */
     public String viewProducts() {
          return JavaPythonBridge.run_result(JavaPythonBridge.GET_ADMIN_PRODUCTS, getUserID());
-    }
-
-    /** Rolls back the database to the last available backup */
-    public void rollbackDatabase() {
-
-        JavaPythonBridge.rollback();
     }
 
     public String toString(){

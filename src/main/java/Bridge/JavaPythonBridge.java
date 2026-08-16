@@ -158,12 +158,5 @@ which is a log for whoever is debugging rather than output for the user.
         }
     }
 
-    public static void rollback() {
-        try {
-            interp.invoke(ROLLBACK);
-        } catch (Exception e) {
-            System.err.println("Error rolling back database: " + e.getMessage());
-        }
-    }
 
 }

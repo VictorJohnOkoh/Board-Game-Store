@@ -1,7 +1,7 @@
 package gui.app.controllers;
 
+import Users.Admin;
 import Users.User;
-import Bridge.JavaPythonBridge;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -64,11 +64,12 @@ public class AdminMenuController {
         confirm.setContentText("This will restore the database to its last backup. All changes since the last backup will be lost.");
 
         if (confirm.showAndWait().orElse(javafx.scene.control.ButtonType.CANCEL) == javafx.scene.control.ButtonType.OK) {
-            try {
-                JavaPythonBridge.rollback();
-                showAlert("Success", "Database has been rolled back successfully.");
-            } catch (Exception e) {
-                showAlert("Rollback Error", "Failed to rollback database: " + e.getMessage());
+            // The outcome comes back as a value: a failed restore used to be reported as a
+            // success here, because the bridge swallowed its own errors and never threw.
+            switch (Admin.rollbackDatabase()) {
+                case RESTORED -> showInfo("Rollback Complete", "The database has been restored to its last backup.");
+                case NO_BACKUP -> showAlert("Rollback Not Possible", "There is no backup to roll back to.");
+                case FAILED -> showAlert("Rollback Error", "The database could not be rolled back.");
             }
         }
     }
@@ -86,6 +87,15 @@ public class AdminMenuController {
         } catch (IOException e){
             showAlert("Logout error","Could not return to the welcome screen: " + e.getMessage());
         }
+    }
+
+    /** Confirmation of something that worked, so it does not arrive wearing an error icon. */
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void showAlert(String title, String message) {

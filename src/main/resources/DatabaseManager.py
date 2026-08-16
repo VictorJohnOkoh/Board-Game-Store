@@ -21,8 +21,16 @@ def init_paths():
     _BACKUP_PATH = os.path.join(_BACKUP_DIR, 'StoreData_backup.db')
 
 def rollback():
-    """Restores the database from the backup"""
+    """Restores the database from the backup.
+
+    Returns 'ROLLED_BACK', or 'NO_BACKUP' when there is nothing to restore from -
+    an admin who has never triggered a backup should be told that rather than be
+    shown a success message for a restore that did not happen.
+    """
+    if not os.path.exists(_BACKUP_PATH):
+        return "NO_BACKUP"
     shutil.copy2(_BACKUP_PATH, _DB_PATH)
+    return "ROLLED_BACK"
 
 def create_backup():
     """Creates a backup of the database"""
@@ -270,13 +278,31 @@ def check_stock(amount: int, ID: int):
         return True
 
 
+def _conflict_token(conflict: str):
+    """Turns a check_product_conflict answer into the matching add_* status token.
+
+    The ID is also protected by the primary key, but the name is not constrained in the
+    schema at all - without this check a second product could take an existing name.
+    """
+    if conflict == "ID":
+        return "DUPLICATE_ID"
+    if conflict == "NAME":
+        return "DUPLICATE_NAME"
+    return "DUPLICATE_BOTH"
+
+
 def add_board_game(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, players: int):
     """Adds a new board game to the BoardGame and BoardGamePlayers tables.
 
-    Returns a status token rather than a sentence - 'ADDED' or 'DUPLICATE_ID' -
-    so each interface can word the outcome its own way. See get_product_by_id
-    ('NOT_FOUND') and check_basket_stock ('OK') for the same convention.
+    Returns a status token rather than a sentence - 'ADDED', 'DUPLICATE_ID',
+    'DUPLICATE_NAME' or 'DUPLICATE_BOTH' - so each interface can word the outcome its
+    own way. See get_product_by_id ('NOT_FOUND') and check_basket_stock ('OK') for the
+    same convention.
     """
+
+    conflict = check_product_conflict(name, productID)
+    if conflict != "NONE":
+        return _conflict_token(conflict)
 
     create_backup()
     try:
@@ -297,8 +323,13 @@ def add_board_game(productID: int, name: str, genretype: str, price: float, stoc
 def add_accessory(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, compatibility: str):
     """Adds a new accessory to the Accessory and AccessoryCompatibility tables.
 
-    Returns 'ADDED' or 'DUPLICATE_ID', matching add_board_game.
+    Returns 'ADDED', 'DUPLICATE_ID', 'DUPLICATE_NAME' or 'DUPLICATE_BOTH',
+    matching add_board_game.
     """
+
+    conflict = check_product_conflict(name, productID)
+    if conflict != "NONE":
+        return _conflict_token(conflict)
 
     create_backup()
     try:
