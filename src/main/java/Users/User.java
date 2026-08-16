@@ -37,8 +37,12 @@ public abstract class User {
    // returns a string representation of the user's information
    public abstract String toString();
 
-   /**allows user to see all available products*/
-   public abstract void viewProducts();
+   /**
+    * Returns every product this user is allowed to see, ready to print, or null when the
+    * database could not be read. Returning the listing rather than printing it is what
+    * lets the GUI put it in a table while the CLI writes it to the console.
+    */
+   public abstract String viewProducts();
 
     /** Takes in user data in the format userid;username;housenum;postcode;city;role*
      * and returns a User
@@ -61,8 +65,9 @@ public abstract class User {
         List<User> userList = new ArrayList<>(List.of());
         String unparsedData = JavaPythonBridge.run_result(JavaPythonBridge.GET_USER_DETAILS);
         if (unparsedData == null || unparsedData.isEmpty()){
-            System.out.println("Failed to load users");
-            throw new NullPointerException();
+            // Carried on the exception rather than printed: the GUI shows this in its alert,
+            // where an empty message used to leave the user reading the word "null".
+            throw new IllegalStateException("No users could be read from the database.");
         }
         List<String> userDataList = List.of(unparsedData.split(","));
         for (String userData : userDataList){

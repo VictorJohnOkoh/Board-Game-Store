@@ -21,9 +21,12 @@ public class Customer extends User{
     }
 
 
-    /** Prints all the products a customer can see to the CLI*/
-    public void viewProducts(){
-        System.out.println(JavaPythonBridge.run_result(JavaPythonBridge.GET_PRODUCTS));
+    /**
+     * @return every product a customer is allowed to see, ready to print, or null when
+     *         the database could not be read - the caller decides what to show either way
+     */
+    public String viewProducts(){
+        return JavaPythonBridge.run_result(JavaPythonBridge.GET_PRODUCTS);
     }
 
         /** Prints the customer's basket to the CLI*/

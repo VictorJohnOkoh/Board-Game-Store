@@ -271,7 +271,12 @@ def check_stock(amount: int, ID: int):
 
 
 def add_board_game(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, players: int):
-    """Adds a new board game to the BoardGame and BoardGamePlayers tables"""
+    """Adds a new board game to the BoardGame and BoardGamePlayers tables.
+
+    Returns a status token rather than a sentence - 'ADDED' or 'DUPLICATE_ID' -
+    so each interface can word the outcome its own way. See get_product_by_id
+    ('NOT_FOUND') and check_basket_stock ('OK') for the same convention.
+    """
 
     create_backup()
     try:
@@ -281,13 +286,19 @@ def add_board_game(productID: int, name: str, genretype: str, price: float, stoc
         cursor.execute(query2, (productID, players))
         conn.commit()
 
-        return "Success"
+        return "ADDED"
     except sqlite3.IntegrityError:
-        return "Product with that ID already exists"
+        # Without this the first INSERT can survive in the open transaction and be
+        # committed by whatever commits next, leaving a board game with no player count.
+        conn.rollback()
+        return "DUPLICATE_ID"
 
 
 def add_accessory(productID: int, name: str, genretype: str, price: float, stock: int, purchase_cost: float, compatibility: str):
-    """Adds a new accessory to the Accessory and AccessoryCompatibility tables"""
+    """Adds a new accessory to the Accessory and AccessoryCompatibility tables.
+
+    Returns 'ADDED' or 'DUPLICATE_ID', matching add_board_game.
+    """
 
     create_backup()
     try:
@@ -297,9 +308,11 @@ def add_accessory(productID: int, name: str, genretype: str, price: float, stock
         cursor.execute(query2, (productID, compatibility))
         conn.commit()
 
-        return "Success"
+        return "ADDED"
     except sqlite3.IntegrityError:
-        return "Product with that ID already exists"
+        # See add_board_game - an uncommitted INSERT must not outlive the failure.
+        conn.rollback()
+        return "DUPLICATE_ID"
 
 def load_users():
     """Returns all users in a semicolon-delimited """

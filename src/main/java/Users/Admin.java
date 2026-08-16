@@ -11,12 +11,60 @@ import java.util.Scanner;
 
 public class Admin extends User{
 
+    /**
+     * The outcome of adding a product, so callers can tell the admin why an add did
+     * not happen. Returning this instead of printing keeps adding a product usable
+     * from both the CLI and the GUI - System.out messages are invisible in a JavaFX
+     * window, and the GUI used to report success even when the database refused the row.
+     */
+    public enum AddResult {
+        ADDED,
+        DUPLICATE_ID,
+        FAILED
+    }
+
     public Admin(int id, String name, Address address) {
         super(id, name, address, "admin");
     }
 
+    /**
+     * Adds a board game to the database.
+     *
+     * @return what happened, so the caller can report it to the admin
+     */
+    public static AddResult addProduct(BoardGame game) {
+        return interpret(JavaPythonBridge.run_result(JavaPythonBridge.ADD_BOARD_GAME, game));
+    }
+
+    /**
+     * Adds an accessory to the database.
+     *
+     * @return what happened, so the caller can report it to the admin
+     */
+    public static AddResult addProduct(Accessory accessory) {
+        return interpret(JavaPythonBridge.run_result(JavaPythonBridge.ADD_ACCESSORY, accessory));
+    }
+
+    /**
+     * Turns the status token from add_board_game/add_accessory into a result.
+     * A null means the call itself failed, which the bridge has already logged.
+     * <p>
+     * Kept separate from the calls above, and visible to the package, so the mapping can be
+     * exercised without a database - the interface reads this to decide what to tell the admin.
+     */
+    static AddResult interpret(String pythonResult) {
+        if (pythonResult == null) {
+            return AddResult.FAILED;
+        }
+        return switch (pythonResult) {
+            case "ADDED" -> AddResult.ADDED;
+            case "DUPLICATE_ID" -> AddResult.DUPLICATE_ID;
+            default -> AddResult.FAILED;
+        };
+    }
+
     // adds a boardgame to the stock file
-    public void addBoardGame(Scanner consoleInput) {
+    public AddResult addBoardGame(Scanner consoleInput) {
         int product_id = 0;
         String name;
         String type;
@@ -60,12 +108,12 @@ public class Admin extends User{
 
       BoardGame product = new BoardGame(product_id, type, name, price, purchase_cost, stock, num_players);
 //      User.stockClass.addStock(product);
-      JavaPythonBridge.run( JavaPythonBridge.ADD_BOARD_GAME, product);
+      return addProduct(product);
 
     }
 
     // adds an accessory to the stock file
-    public void addAccessory(Scanner consoleInput) {
+    public AddResult addAccessory(Scanner consoleInput) {
         int product_id = 0;
         String name;
         AccessoryType type;
@@ -120,12 +168,16 @@ public class Admin extends User{
 
         Accessory product = new Accessory(product_id, type, name, price, purchase_cost, stock, compatibility);
 //        User.stockClass.addStock(product);
-        JavaPythonBridge.run(JavaPythonBridge.ADD_ACCESSORY, product);
+        return addProduct(product);
     }
 
 
-    public void viewProducts() {
-         System.out.println(JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS, getUserID()));
+    /**
+     * @return every product with its purchase cost, ready to print, or null when the
+     *         database could not be read - the caller decides what to show either way
+     */
+    public String viewProducts() {
+         return JavaPythonBridge.run_result(JavaPythonBridge.GET_ADMIN_PRODUCTS, getUserID());
     }
 
     /** Rolls back the database to the last available backup */

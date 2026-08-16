@@ -86,11 +86,13 @@ public class newBasket {
      * Removes {@code amount} units of {@code product} from the basket.
      * If the resulting amount is zero or less, the product is removed
      * entirely from the basket.
+     *
+     * @return false when the product was not in the basket, so the caller can say so in
+     *         its own words - this is reached from the GUI, where a printed line is lost
      */
-    public void removeProduct(Product product, int amount) {
+    public boolean removeProduct(Product product, int amount) {
         if (!items.containsKey(product)) {
-            System.out.println("\"" + product.getProductName() + "\" is not in the basket.");
-            return;
+            return false;
         }
 
         int currentAmount = items.get(product);
@@ -101,6 +103,7 @@ public class newBasket {
         } else {
             items.put(product, newAmount);
         }
+        return true;
     }
 
     /** Empties the basket completely. */

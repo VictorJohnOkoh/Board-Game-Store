@@ -52,7 +52,7 @@ public class ViewProductsController {
     }
 
     private void loadProducts() {
-        String rawData = JavaPythonBridge.run(JavaPythonBridge.GET_ADMIN_PRODUCTS_RAW, currentUserId);
+        String rawData = JavaPythonBridge.run_result(JavaPythonBridge.GET_ADMIN_PRODUCTS_RAW, currentUserId);
         productsTable.setItems(parseProducts(rawData));
     }
 

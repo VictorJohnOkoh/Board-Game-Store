@@ -41,113 +41,63 @@ public class JavaPythonBridge {
             interp.set("__file__", scriptPath.toString());
             interp.runScript(scriptPath.toString());
         } catch (RuntimeException e) {
-            System.out.println("Could not connect to the DBMS script: " + e.getMessage());
+            System.err.println("Could not connect to the DBMS script: " + e.getMessage());
         }
     }
 
 
 /*
-A run method typically will not return anything while a run_result method returns some value(s)
+Every method here returns what Python returned and prints nothing, so the same call works
+from the CLI and the GUI - the interface decides how to show the outcome. A null return
+means Python returned None or the call failed; the failure itself is logged to System.err,
+which is a log for whoever is debugging rather than output for the user.
  */
 
 //    running functions without any parameters
-    public static void run(String functionName) {
-        // SharedInterpreter opens an inline Python terminal inside your Java code
-        try  {
-            // Calls the function name
-            Object result = interp.invoke(functionName);
-            if  (result == null) {
-                System.out.println("Nothing was returned");
-            } else {
-                String output = result.toString();
-                System.out.println(output);
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
     public static String run_result(String functionName) {
         // SharedInterpreter opens an inline Python terminal inside your Java code
         try {
             // Calls the function name
             Object result = interp.invoke(functionName);
-            if  (result == null) {
-                System.out.println("Nothing was returned");
-            } else {
-                return result.toString();
-            }
+            return result == null ? null : result.toString();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            return logFailure(functionName, e);
         }
-        return null;
     }
 
 //    running functions that need an ID
-    public static String run(String functionName, int id) {
-        // SharedInterpreter opens an inline Python terminal inside your Java code
-        try {
-
-            // Calls the function name
-            Object result = interp.invoke(functionName, id);
-            if  (result == null) {
-                return null;
-            } else {
-                return result.toString();
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-        return "Something went wrong";
-    }
-
-//    for adding a board game object
-    public static void run(String functionName, BoardGame bgame) {
-        // SharedInterpreter opens an inline Python terminal inside your Java code
-        try  {
-
-            // creates a python boardgame class for temporary data storage
-
-            // Calls the addBoardGame function
-            Object result = interp.invoke(functionName, bgame.getProductID(), bgame.getProductName(), bgame.getType(), bgame.getPrice(), bgame.getQuantityInStock(), bgame.getPurchaseCost(), bgame.getNumPlayers());
-            if  (result == null) {
-                System.out.println("Nothing was returned");
-            } else {
-                String output = result.toString();
-                System.out.println(output);
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
-    /** Passes the information for an accessory to be added to the database*/
-    public static void run(String functionName, Accessory accessory) {
-
-        try  {
-
-            Object result = interp.invoke(functionName, accessory.getProductID(), accessory.getProductName(), accessory.getType(), accessory.getPrice(), accessory.getQuantityInStock(), accessory.getPurchaseCost(), accessory.getCompatibility());
-            if (result == null) {
-                System.out.println("Transaction failed");
-            } else {
-                String output = result.toString();
-                System.out.println(output);
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
     public static String run_result(String functionName, int id) {
         try  {
 
             Object result = interp.invoke(functionName, id);
-            if (result == null) return null;
-            return result.toString();
+            return result == null ? null : result.toString();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            return logFailure(functionName, e);
+        }
+    }
+
+//    for adding a board game object
+    public static String run_result(String functionName, BoardGame bgame) {
+        // SharedInterpreter opens an inline Python terminal inside your Java code
+        try  {
+
+            // Calls the addBoardGame function
+            Object result = interp.invoke(functionName, bgame.getProductID(), bgame.getProductName(), bgame.getType(), bgame.getPrice(), bgame.getQuantityInStock(), bgame.getPurchaseCost(), bgame.getNumPlayers());
+            return result == null ? null : result.toString();
+        } catch (Exception e) {
+            return logFailure(functionName, e);
+        }
+    }
+
+    /** Passes the information for an accessory to be added to the database*/
+    public static String run_result(String functionName, Accessory accessory) {
+
+        try  {
+
+            Object result = interp.invoke(functionName, accessory.getProductID(), accessory.getProductName(), accessory.getType(), accessory.getPrice(), accessory.getQuantityInStock(), accessory.getPurchaseCost(), accessory.getCompatibility());
+            return result == null ? null : result.toString();
+        } catch (Exception e) {
+            return logFailure(functionName, e);
         }
     }
 
@@ -155,11 +105,9 @@ A run method typically will not return anything while a run_result method return
         try {
 
             Object result = interp.invoke(functionName, data);
-            if (result == null) return null;
-            return result.toString();
+            return result == null ? null : result.toString();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            return logFailure(functionName, e);
         }
     }
 
@@ -167,11 +115,9 @@ A run method typically will not return anything while a run_result method return
         try {
 
             Object result = interp.invoke(functionName, name, id);
-            if (result == null) return null;
-            return result.toString();
+            return result == null ? null : result.toString();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            return logFailure(functionName, e);
         }
     }
 
@@ -179,12 +125,20 @@ A run method typically will not return anything while a run_result method return
         try {
 
             Object result = interp.invoke(functionName, id, amount, category);
-            if (result == null) return null;
-            return result.toString();
+            return result == null ? null : result.toString();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            return logFailure(functionName, e);
         }
+    }
+
+    /**
+     * Records a failed call and returns the null every caller treats as "no answer".
+     * Kept out of stdout so it can never be mistaken for a value or interleave with
+     * the CLI's menus.
+     */
+    private static String logFailure(String functionName, Exception e) {
+        System.err.println("Error calling " + functionName + ": " + e.getMessage());
+        return null;
     }
 
     public static String updateStock(java.util.Map<Integer, Integer> basketData) {
@@ -200,17 +154,15 @@ A run method typically will not return anything while a run_result method return
         try {
             interp.close();
         } catch (Exception e) {
-            System.out.println("Error closing SharedInterpreter: " + e.getMessage());
+            System.err.println("Error closing SharedInterpreter: " + e.getMessage());
         }
-        System.out.println("Bridge closed successfully.");
-        return;
     }
 
     public static void rollback() {
         try {
             interp.invoke(ROLLBACK);
         } catch (Exception e) {
-            System.out.println("Error rolling back database: " + e.getMessage());
+            System.err.println("Error rolling back database: " + e.getMessage());
         }
     }
 
