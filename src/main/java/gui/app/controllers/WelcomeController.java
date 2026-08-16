@@ -144,7 +144,9 @@ public class WelcomeController {
 
     @FXML
     private void handleExit() {
-        JavaPythonBridge.run(JavaPythonBridge.CLOSE_CONNECTION);
+        // close_connection reports how it went, but there is no window left to show it in
+        // and a desktop app must not write to a terminal the user cannot see.
+        JavaPythonBridge.run_result(JavaPythonBridge.CLOSE_CONNECTION);
         JavaPythonBridge.close();
         Stage stage = (Stage) userGrid.getScene().getWindow();
         stage.close();

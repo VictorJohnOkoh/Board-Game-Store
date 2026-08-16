@@ -17,7 +17,8 @@ public class CustomerCLI {
                 switch (choice) {
                     // displays all products
                     case 1:
-                        customer.viewProducts();
+                        String products = customer.viewProducts();
+                        System.out.println(products == null ? "Products could not be loaded." : products);
                         System.out.println();
                         break;
                         

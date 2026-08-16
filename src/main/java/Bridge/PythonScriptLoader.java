@@ -63,8 +63,9 @@ public class PythonScriptLoader {
             } catch (DirectoryNotEmptyException ignored) {
                 // Something else is using the folder - leaving it is the safe outcome.
             } catch (IOException e) {
-                // Cleanup must never be the reason a shutdown fails.
-                System.out.println("Could not remove the temporary script: " + e.getMessage());
+                // Cleanup must never be the reason a shutdown fails. Logged rather than
+                // printed - the hook also runs behind the GUI, which has no console.
+                System.err.println("Could not remove the temporary script: " + e.getMessage());
             }
         }, "python-script-cleanup"));
     }

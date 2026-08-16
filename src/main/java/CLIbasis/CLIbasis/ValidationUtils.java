@@ -131,6 +131,27 @@ public class ValidationUtils {
     }
 
     /**
+     * Asks the user to confirm an action that cannot be undone.
+     * <p>
+     * Only an explicit yes goes ahead. An empty line means no, so an admin pressing Enter
+     * to get past the prompt never destroys anything, and anything unrecognised re-prompts
+     * rather than being guessed at.
+     */
+    public static boolean confirm(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt + " [y/N]: ");
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.isEmpty() || input.equals("n") || input.equals("no")) {
+                return false;
+            }
+            if (input.equals("y") || input.equals("yes")) {
+                return true;
+            }
+            System.out.println("Please answer y or n.\n");
+        }
+    }
+
+    /**
      * Prompts user for input and validates it contains only English letters (a-z, A-Z).
      * Re-prompts until valid input is provided.
      */

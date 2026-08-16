@@ -3,7 +3,7 @@ package gui.app.controllers;
 import Inventory.Accessory;
 import Inventory.AccessoryType;
 import Inventory.BoardGame;
-import Bridge.JavaPythonBridge;
+import Users.Admin;
 import Users.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -54,9 +54,18 @@ public class AddProductController {
             int stock = Integer.parseInt(bgStockField.getText().trim());
 
             BoardGame product = new BoardGame(id, type, name, price, cost, stock, players);
-            JavaPythonBridge.run(JavaPythonBridge.ADD_BOARD_GAME, product);
-            statusLabel.setText("Board game added successfully.");
-            clearBoardGameFields();
+            // The fields are only cleared once the database has confirmed the row, so a
+            // failed add leaves the entered values on screen to be corrected.
+            Admin.AddResult result = Admin.addProduct(product);
+            switch (result) {
+                case ADDED -> {
+                    statusLabel.setText("Board game added successfully.");
+                    clearBoardGameFields();
+                }
+                case DUPLICATE_ID, DUPLICATE_NAME, DUPLICATE_BOTH ->
+                        reportAddFailure(describeConflict(result, id, name));
+                case FAILED -> reportAddFailure("The board game could not be saved. Please try again.");
+            }
         } catch (NumberFormatException e) {
             showAlert("Invalid Input", "Please check the numeric fields are filled in correctly.");
         } catch (IllegalArgumentException e) {
@@ -80,9 +89,16 @@ public class AddProductController {
             int stock = Integer.parseInt(accStockField.getText().trim());
 
             Accessory product = new Accessory(id, type, name, price, cost, stock, compatibility);
-            JavaPythonBridge.run(JavaPythonBridge.ADD_ACCESSORY, product);
-            statusLabel.setText("Accessory added successfully.");
-            clearAccessoryFields();
+            Admin.AddResult result = Admin.addProduct(product);
+            switch (result) {
+                case ADDED -> {
+                    statusLabel.setText("Accessory added successfully.");
+                    clearAccessoryFields();
+                }
+                case DUPLICATE_ID, DUPLICATE_NAME, DUPLICATE_BOTH ->
+                        reportAddFailure(describeConflict(result, id, name));
+                case FAILED -> reportAddFailure("The accessory could not be saved. Please try again.");
+            }
         } catch (NumberFormatException e) {
             showAlert("Invalid Input", "Please check the numeric fields are filled in correctly.");
         } catch (IllegalArgumentException e) {
@@ -154,6 +170,28 @@ public class AddProductController {
         accStockField.clear();
         accCostField.clear();
         accCompatField.clear();
+    }
+
+    /**
+     * Names whichever of the ID and the name is already taken, so the admin can see what to
+     * change rather than being sent back to guess. Shared by both product types.
+     */
+    private static String describeConflict(Admin.AddResult result, int id, String name) {
+        return switch (result) {
+            case DUPLICATE_ID -> "A product with ID " + id + " already exists.";
+            case DUPLICATE_NAME -> "A product named \"" + name + "\" already exists.";
+            case DUPLICATE_BOTH -> "A product with ID " + id + " already exists, and so does one named \"" + name + "\".";
+            case ADDED, FAILED -> throw new IllegalArgumentException("Not a conflict: " + result);
+        };
+    }
+
+    /**
+     * Reports a refused add. The status label is cleared as well as raising the alert, so a
+     * success message from an earlier add cannot sit under a failure and imply it worked.
+     */
+    private void reportAddFailure(String message) {
+        statusLabel.setText("");
+        showAlert("Could Not Add Product", message);
     }
 
     private void showAlert(String title, String message) {
