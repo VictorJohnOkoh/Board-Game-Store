@@ -44,7 +44,7 @@ interface — the customer queries do not select the `pcost` column at all.
 
 ```bash
 mvn clean package      # build
-mvn test               # run the tests (56 of them)
+mvn test               # run the tests (60 of them)
 ```
 
 Then run `gui.app.MainApp` from your IDE. There is also a command line version at

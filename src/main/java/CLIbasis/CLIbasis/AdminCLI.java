@@ -36,8 +36,15 @@ public class AdminCLI {
                                 break;
                         }
                         break;
+                    // rolls the database back, but only once the admin has confirmed it -
+                    // everything since the last backup is lost and there is no undo
                     case 3:
-                        System.out.println(describeRollback(Admin.rollbackDatabase()));
+                        if (ValidationUtils.confirm(consoleInput,
+                                "Roll the database back to its last backup? Every change since then will be lost.")) {
+                            System.out.println(describeRollback(Admin.rollbackDatabase()));
+                        } else {
+                            System.out.println("Rollback cancelled.\n");
+                        }
                         break;
                     case 0:
                         return;
