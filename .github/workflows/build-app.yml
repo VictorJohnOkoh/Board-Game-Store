@@ -106,6 +106,7 @@ jobs:
           # then warns that nothing matches **/uv.lock or **/requirements*.txt. uv is
           # only used here to install a Python interpreter, never to resolve
           # dependencies, so there is nothing worth caching.
+          version: "0.12.5"
           enable-cache: false
 
       - name: Download jar and runtime libs
